@@ -2,6 +2,7 @@ package com.example.dnpclientstation.service;
 
 import com.example.dnpclientstation.domain.Role;
 import com.example.dnpclientstation.domain.User;
+import com.example.dnpclientstation.repositories.CardRepo;
 import com.example.dnpclientstation.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CardRepo cardRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

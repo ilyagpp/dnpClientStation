@@ -1,4 +1,7 @@
+create sequence card_seq start 1 increment 1;
 create sequence hibernate_sequence start 1 increment 1;
+create sequence msg_seq start 1 increment 1;
+create sequence trans_seq start 1 increment 1;
 create table message (
     id int8 not null,
     tag varchar(255),

@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import java.util.Map;
 
 @Controller
+
 public class MainController {
 
     @Autowired
@@ -24,7 +25,7 @@ public class MainController {
 
     @GetMapping("/")
     public String greeting(Map<String, Object> model){
-        return "greeting";
+        return "start";
     }
 
     @GetMapping("/main")

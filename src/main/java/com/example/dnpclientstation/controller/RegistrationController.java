@@ -1,6 +1,8 @@
 package com.example.dnpclientstation.controller;
 
+import com.example.dnpclientstation.domain.Client;
 import com.example.dnpclientstation.domain.User;
+import com.example.dnpclientstation.service.CardService;
 import com.example.dnpclientstation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,9 @@ public class RegistrationController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CardService cardService;
+
     @GetMapping("/registration")
     public String registration(){
         return "registration";
@@ -31,6 +36,7 @@ public class RegistrationController {
             @RequestParam("password2") String passwordConfirm,
             @Valid User user,
             BindingResult bindingResult,
+            Client client,
             Model model) {
 
         boolean isConfirmEmpty = StringUtils.isEmpty(passwordConfirm);

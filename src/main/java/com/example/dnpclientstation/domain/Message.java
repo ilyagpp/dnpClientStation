@@ -12,7 +12,8 @@ import javax.validation.constraints.*;
 public class Message {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "msg_generator")
+    @SequenceGenerator(name="msg_generator", sequenceName = "msg_seq", allocationSize = 1, initialValue = 1)
     private Long id;
 
     @NotBlank(message = "Поле не может быть пустым")

@@ -2,9 +2,13 @@
 
 <@c.page>
     List of users
+    <form method="get" class="form-inline">
+        <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Найти</button>
+    </form>
 
-    <table>
-        <thead>
+    <table class="table mt-3">
+        <thead class="thead-light">
         <tr>
             <th>Name</th>
             <th>Role</th>
