@@ -19,10 +19,10 @@ public class Client implements Persistable<Long>{
     private Long id;
 
 
-    @NotBlank(message = "Поле Фамилия не может быть пустым")
+    @NotBlank(message = "Поле не может быть пустым")
     private String name;
 
-    @NotBlank(message = "Поле Имя не может быть пустым")
+    @NotBlank(message = "Поле не может быть пустым")
     private String surname;
 
     private String patronymic;
@@ -41,9 +41,10 @@ public class Client implements Persistable<Long>{
 
 
     @Email(message = "поле должно соответствовать типу: \"user@usermail.com\"")
+    @NotBlank(message = "Поле не может быть пустым")
     private String email;
 
-    @NotBlank(message = "Поле email не может быть пустым")
+    @NotBlank(message = "Поле не может быть пустым")
     private String phoneNumber;
 
     @ManyToOne

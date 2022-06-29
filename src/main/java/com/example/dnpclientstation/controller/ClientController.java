@@ -23,6 +23,14 @@ public class ClientController {
     @Autowired
     ClientService clientService;
 
+    @GetMapping("/clients")
+    public String getAllClients(Model model){
+        List<Client> list = clientService.findAll();
+        model.addAttribute("clients", list);
+
+        return "/clients";
+    }
+
     @GetMapping("/client/new")
     public String get(Model model){
 
@@ -34,18 +42,25 @@ public class ClientController {
                                BindingResult result,
                                Model model){
 
+        if (client.getEmail()!=null && !clientService.checkEmail(client.getEmail())){
+            model.addAttribute("emailError",  String.format("Email %s уже зарегистрирован, попробуйте другой",client.getEmail()));
+        }
 
+        if (client.getPhoneNumber() !=null && !clientService.checkPhoneNumber(client.getPhoneNumber())){
+            model.addAttribute("phoneNumberError", String.format("Номер %s уже зарегистрирован, попробуйте другой",client.getPhoneNumber()));
+        }
 
         if (result.hasErrors()){
             Map<String,String> errors = ControllerUtils.getErrors(result);
             model.mergeAttributes(errors);
+
             model.addAttribute("client", client);
 
             return "/client";
         }
         if (addNewClient(client, model)){
-           return "/clientadd";
-        }
+           return "clientOK";
+        } else model.addAttribute("clientError", "Ошибка! Клиент не создан!");
 
         return "/client";
 
@@ -122,6 +137,8 @@ public class ClientController {
         return true;
 
     }
+
+
 
 
 

@@ -1,11 +1,14 @@
 <#import "parts/common.ftl" as c>
-<#import "parts/formtransaction.ftl" as f>
+<#import "parts/modalFormTransactions.ftl" as f>
 <#import "parts/TimeRangeForm.ftl" as t>
-
+<#import "parts/fuel.ftl" as fuel>
+<#import "parts/pager.ftl" as pager>
+<#import  "parts/sizer.ftl" as sizer>
 
 <@c.page>
-
-
+    <div class="mt-3">
+    <@sizer.sizer url page/>
+    </div>
     <div class="card mt-3">
         <div class="card-header ">
             Поиск информации:
@@ -46,21 +49,26 @@
                     <input type="hidden" name="clientId" value="${client.id}">
                     <input type="hidden" name="_csrf" value="${_csrf.token}">
                 </div>
-                    <#if client.clientCard??>
-                    <div class="mt-3">
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
-                                data-whatever="@mdo">
-                            Накопить бонусы
-                        </button>
-                        <button type="button" class="btn btn-primary ml-2" data-toggle="modal"
-                                data-target="#useBonusModal"
-                                data-whatever="@mdo">Списать бонусы
-                        </button>
-                    </div>
-                        <#else>
-                            <div class="alert alert-danger mt-3" role="alert">
-                                Операции для клиентов без карты невозможны!
-                            </div>
+                    <#if client.clientCard?? && client.isActive()>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                    data-target="#exampleModal"
+                                    data-whatever="@mdo">
+                                Накопить бонусы
+                            </button>
+                            <button type="button" class="btn btn-primary ml-2" data-toggle="modal"
+                                    data-target="#useBonusModal"
+                                    data-whatever="@mdo">Списать бонусы
+                            </button>
+                        </div>
+                    <#elseif !client.clientCard??>
+                        <div class="alert alert-danger mt-3" role="alert">
+                            Операции для клиентов без карты невозможны!
+                        </div>
+                        <#elseif !client.isActive()>
+                        <div class="alert alert-danger mt-3" role="alert">
+                            Клиент деактивирован! Операция не возможна!
+                        </div>
                     </#if>
                 </div>
 
@@ -84,35 +92,35 @@
 
     <div>
         <table class="table mt-3">
-            <thead class="thead-light">
+            <thead class="thead-light text-center">
             <tr>
-                <th scope="col">ID</th>
                 <th scope="col">Создано</th>
                 <th scope="col">Вид ГСМ</th>
                 <th scope="col">Цена</th>
                 <th scope="col">Объем</th>
                 <th scope="col">Итог</th>
-                <th scope="col">Начислено/Списано<br>Бонусов</th>
+                <th scope="col">Начислено/Списано</th>
                 <th scope="col">Карта</th>
                 <th scope="col">АЗС</th>
             </tr>
             </thead>
             <tbody>
-            <#list transactions as transaction>
+            <#list page.content as transaction>
 
                 <div class="text-center">
-                    <tr>
-                        <th scope="col">${transaction.id}</th>
+                    <tr class="text-center" size="10">
                         <th scope="col">
                             ${transaction.createDateTime.toLocalTime().hour}:
                             ${transaction.createDateTime.toLocalTime().minute}:
-                            ${transaction.createDateTime.toLocalTime().second}
+                            ${transaction.createDateTime.toLocalTime().second}  -
                             ${transaction.createDateTime.toLocalDate()}</th>
-                        <th scope="col">${transaction.fuel}</th>
-                        <th scope="col">${transaction.price}</th>
-                        <th scope="col">${transaction.volume}</th>
-                        <th scope="col">${transaction.total}</th>
-                        <th scope="col">${transaction.bonus}</th>
+                        <th scope="col">
+                        <@fuel.fuelnames fuel= transaction.fuel></@fuel.fuelnames>
+                        </th>
+                        <th scope="col"> ${transaction.price?string["0.00"]}</th>
+                        <th scope="col">${transaction.volume?string["0.00"]}</th>
+                        <th scope="col">${transaction.total?string["0.00"]}</th>
+                        <th scope="col">${transaction.bonus?string["0.00"]}</th>
                         <th scope="col">${transaction.clientCard}</th>
                         <th scope="col">${transaction.creator.username}</th>
                     </tr>
@@ -121,6 +129,5 @@
             </tbody>
         </table>
     </div>
-
-
+    <@pager.pager url page />
 </@c.page>

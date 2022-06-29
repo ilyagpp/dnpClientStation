@@ -16,5 +16,18 @@ public class ControllerUtils {
         return bindingResult.getFieldErrors().stream().collect(collector);
     }
 
+    static String checkByСomma (String s){
+
+        return s.replace(',' , '.');
+    }
+
+    static String[] checkByComa (String[] strings){
+
+        for (int i = 0; i < strings.length; i++){
+
+            strings[i] = checkByСomma(strings[i]);
+        }
+        return strings;
+    }
 
 }

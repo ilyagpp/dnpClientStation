@@ -6,8 +6,11 @@ import com.example.dnpclientstation.repositories.ClientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -31,11 +34,14 @@ public class ClientService {
     }
 
     public Client findByClientCard(ClientCard clientCard){
-        return clientRepo.findByClientCard(clientCard);
+
+        return clientCard!=null? clientRepo.findByClientCard(clientCard): null;
+
     }
 
     public List<Client> findAll(){
-        return clientRepo.findAll();
+
+        return clientRepo.findAll().stream().sorted(Comparator.comparing(Client::getId)).collect(Collectors.toList());
     }
 
     public List<Client> findAllByClientCardIsNullOrderById() {
@@ -64,5 +70,13 @@ public class ClientService {
         client = clientRepo.findByName(search);
 
         return client;
+    }
+
+    public boolean checkEmail(String email) {
+        return clientRepo.findByEmail(email) == null;
+    }
+
+    public boolean checkPhoneNumber(String phoneNumber) {
+        return clientRepo.findByPhoneNumber(phoneNumber) == null;
     }
 }

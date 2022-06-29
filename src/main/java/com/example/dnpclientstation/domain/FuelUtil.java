@@ -1,15 +1,19 @@
 package com.example.dnpclientstation.domain;
 
+import java.util.Locale;
+
 public class FuelUtil {
 
     public static String convert(String fuel){
 
+        fuel = fuel.toUpperCase(Locale.ROOT);
         switch (fuel){
-            case "Дт": return Fuel.DIESEL.name();
 
-            case "Аи-92": return Fuel.AI_92.name();
+            case "ДТ": return Fuel.DIESEL.name();
 
-            case "Аи-95": return Fuel.AI_95.name();
+            case "АИ-92": return Fuel.AI_92.name();
+
+            case "АИ-95": return Fuel.AI_95.name();
 
             case "СУГ": return Fuel.SUG.name();
 

@@ -11,19 +11,21 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/">Домой</a>
+                <a class="nav-link" aria-current="page" href= "
+                <#if isAdmin || isAzsAdmin>/main-operator<#else>/</#if>
+                "> Домой</a>
             </li>
             <#if isAdmin>
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/user">Список пользователей</a>
                 </li>
             </#if>
-            <#if isAdmin??>
+            <#if isAdmin  || isAzsAdmin>
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/user/profile">Профиль</a>
                 </li>
             </#if>
-            <#if isAdmin??>
+            <#if isAdmin || isAzsAdmin>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" aria-current="page"  href="#" id="CardWorkingSpace" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Клиенты
@@ -35,12 +37,12 @@
                     </div>
                 </li>
             </#if>
-            <#if isAdmin??>
+            <#if isAdmin || isAzsAdmin>
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/transactions">Транзакции</a>
                 </li>
             </#if>
-            <#if isAdmin??>
+            <#if isAdmin  || isAzsAdmin>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" aria-current="page"  href="#" id="CardWorkingSpace" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Карты

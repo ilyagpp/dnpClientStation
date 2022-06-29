@@ -69,4 +69,16 @@ public class CardService {
     public ClientCard findByCardNumber(String cardNumber) {
         return cardRepo.findByCardNumber(cardNumber);
     }
+
+    public boolean automaitcCreateNewCard(){
+        try {
+            Long number = Long.valueOf(getLastCardNumber()) +1;
+            String newNumber = String.valueOf(number);
+            addNewCard(newNumber);
+        }catch (Exception e){
+         return false;
+        }
+        return true;
+    }
+
 }

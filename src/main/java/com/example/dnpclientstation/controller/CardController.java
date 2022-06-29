@@ -65,6 +65,14 @@ public class CardController {
         return "redirect:/cards";
     }
 
+    @PostMapping("/cards/auto")
+    public String autoNewCard(Model model){
+
+        cardService.automaitcCreateNewCard();
+
+        return "redirect:/cards";
+    }
+
     @PostMapping("/card/{card}")
     public String issueCard(@PathVariable ClientCard card,
                                     @RequestParam String clientId,

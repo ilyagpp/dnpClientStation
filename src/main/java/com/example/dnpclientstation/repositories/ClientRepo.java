@@ -21,4 +21,6 @@ public interface ClientRepo extends JpaRepository<Client, Long> {
 
     public List<Client> findAllByClientCardIsNullOrderById();
 
+
+
 }

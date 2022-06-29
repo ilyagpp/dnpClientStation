@@ -15,8 +15,9 @@
                 <input type="hidden" name="free" value="'1'">
                 <button class="btn btn-primary" type="submit">Свободные карты</button>
             </form>
-            <form method="get" class="form-inline">
-                <a class="btn btn-primary" href="/client" role="link">Новый Клиент</a>
+            <form method="post" action="/cards/auto" class="form-inline ml-lg-2">
+                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                <button class="btn btn-primary mr-2" type="submit">Новая карта</button>
             </form>
         </div>
     </div>

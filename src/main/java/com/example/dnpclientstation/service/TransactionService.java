@@ -4,12 +4,13 @@ import com.example.dnpclientstation.domain.*;
 import com.example.dnpclientstation.repositories.TransactionsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -30,6 +31,9 @@ public class TransactionService {
     @Autowired
     private ClientService clientService;
 
+    @Autowired
+    private PriceService priceService;
+
     public Optional<FuelTransaction> findFuelTransactionById(Long id) {
         return transactionsRepo.findById(id);
     }
@@ -42,7 +46,7 @@ public class TransactionService {
         return transactionsRepo.findByCreatorId(user.getId());
     }
 
-    public List<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(User user, String start, String end) {
+    public Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(User user, String start, String end, Pageable pageable) {
 
         LocalDateTime startTime;
         if (StringUtils.isEmpty(start)) {
@@ -60,15 +64,7 @@ public class TransactionService {
         }
 
 
-        List<FuelTransaction> result;
-        try {
-            result = transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(user.getId(), startTime, endTime);
-        } catch (Exception exception) {
-            result = new ArrayList<>();
-        }
-
-
-        return result;
+        return transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(user.getId(), startTime, endTime, pageable);
     }
 
 
@@ -78,7 +74,7 @@ public class TransactionService {
         ClientCard clientCard = cardService.findByCardNumber(cardNumber);
 
 
-        if (clientCard == null) {
+        if (clientCard == null || volume == 0.0f) {
             return false;
         }
 
@@ -114,11 +110,6 @@ public class TransactionService {
 
             transaction.setBonus(getTotal(transaction.getVolume(), transaction.getPrice()) * getBonusPercent());
 
-            clientCard.setBonus(clientCard.getBonus() + transaction.getBonus());
-            transactionsRepo.save(transaction);
-            cardService.save(clientCard);
-            return true;
-
         } else {
             transaction = new FuelTransaction();
             transaction.setFuel(FuelUtil.convert(fuel));
@@ -130,15 +121,19 @@ public class TransactionService {
             transaction.setTotal(getTotal(volume, price));
             transaction.setBonus(getTotal(volume, price) * getBonusPercent());
             transaction.setCreator(creator);
-            clientCard.setBonus(clientCard.getBonus() + transaction.getBonus());
-            transactionsRepo.save(transaction);
-            cardService.save(clientCard);
-            return true;
         }
+        clientCard.setBonus(clientCard.getBonus() + transaction.getBonus());
+        transactionsRepo.save(transaction);
+        cardService.save(clientCard);
+        return true;
     }
 
     public Float getTotal(Float volume, Float price) {
-        return volume * price;
+        return (float) ServiceUtil.round(volume * price, 2);
+    }
+
+    public Float getVolume(Float total, Float price){
+        return (float)  ServiceUtil.round(total/price, 2);
     }
 
     public Float getBonusPercent() {
@@ -154,7 +149,7 @@ public class TransactionService {
         return cardService.findByCardNumber(cardNumber);
     }
 
-    public Client searchClientbyCardNameEmailPhone(String search) {
+    public Client searchClientByCardNameEmailPhone(String search) {
 
         Client client = clientService.search(search);
         if (client != null) return client;
@@ -164,4 +159,31 @@ public class TransactionService {
     }
 
 
+    public List<Price> getPriceListByCreatorId(Long creatorId){
+        return priceService.findAllByCreatorId(creatorId);
+    }
+
+    @Transactional(readOnly = false)
+    public int useBonus(String fuel, String clientCard, Float bonus, Float price, User creator) {
+        ClientCard card = cardService.findByCardNumber(clientCard);
+        if (card.getBonus()>= bonus){
+            FuelTransaction useBonusTransaction = new FuelTransaction();
+            useBonusTransaction.setCreator(creator);
+            useBonusTransaction.setBonus(bonus * -1);
+            useBonusTransaction.setClientCard(clientCard);
+            useBonusTransaction.setCreateDateTime(LocalDateTime.now());
+            useBonusTransaction.setUpdateDateTime(LocalDateTime.now());
+            useBonusTransaction.setPrice(price);
+            useBonusTransaction.setVolume(getVolume(bonus,price));
+            useBonusTransaction.setTotal(bonus);
+            useBonusTransaction.setFuel(FuelUtil.convert(fuel));
+
+            card.setBonus(card.getBonus() - bonus);
+
+            transactionsRepo.save(useBonusTransaction);
+            cardService.save(card);
+            return 1;//all operation completed;
+        }
+        return -1; //not enough bonuses
+    }
 }

@@ -1,8 +1,12 @@
 package com.example.dnpclientstation.controller;
 
+import com.example.dnpclientstation.domain.Client;
 import com.example.dnpclientstation.domain.Message;
+import com.example.dnpclientstation.domain.Price;
 import com.example.dnpclientstation.domain.User;
 import com.example.dnpclientstation.repositories.MessageRepo;
+import com.example.dnpclientstation.service.PriceService;
+import com.example.dnpclientstation.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -13,24 +17,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 @Controller
 
 public class MainController {
 
+
+    @Autowired
+    TransactionService transactionService;
+    @Autowired
+    PriceService priceService;
+
     @Autowired
     private MessageRepo messageRepo;
 
 
     @GetMapping("/")
-    public String greeting(Map<String, Object> model){
+    public String greeting(Model model){
         return "start";
     }
 
     @GetMapping("/main")
     public String main(@RequestParam(required = false, defaultValue = "") String filter, Model model){
-        Iterable<Message> messages = messageRepo.findAll();
+        Iterable<Message> messages;
         if(filter != null && !filter.isEmpty()){
             messages  = messageRepo.findByTag(filter);
         } else {
@@ -64,6 +75,49 @@ public class MainController {
         model.addAttribute("messages", messages);
 
         return "main";
+    }
+
+
+    @GetMapping ("/main-operator")
+    public String operatorMain(@AuthenticationPrincipal User creator,
+                               @RequestParam(required = false) String search,
+                               Model model){
+
+
+        List<Price> priceList = priceService.getSetupList(creator);
+
+        model.addAttribute("priceList", priceList);
+
+
+        if (search != null) {
+            Client client = transactionService.searchClientByCardNameEmailPhone(search);
+            if (client != null) {
+                model.addAttribute("client", client);
+            } else {
+                model.addAttribute("clientError", String.format("по запросу %s данные в системе отсутствуют", search));
+            }
+        }
+
+
+        return "/operatorMain";
+    }
+
+
+
+    @PostMapping("/main-operator")
+    public String setUp(@AuthenticationPrincipal User creator,
+                        @RequestParam String[] price,
+                        @RequestParam String[] fuel,
+                        @RequestParam Long[] id,
+                        Model model){
+
+        ControllerUtils.checkByComa(price);
+
+        if(priceService.setUpPriceList(id, fuel, price, creator)) {
+            model.addAttribute("priceSetUpComplete", "Цены успешно установлены!");
+        }else model.addAttribute("priceSetUpError", "Что-то пошло не так! Обратитесь к администратору!");
+
+        return "redirect:/main-operator";
     }
 
 }

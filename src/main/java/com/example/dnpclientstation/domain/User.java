@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
+import javax.validation.constraints .Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Set;
@@ -54,6 +54,8 @@ public class User implements UserDetails {
     public boolean isAdmin(){
         return roles.contains(Role.ADMIN);
     }
+
+    public boolean isAzsAdmin(){return  roles.contains(Role.AZS_ADMIN);}
 
     public Long getId() {
         return id;
