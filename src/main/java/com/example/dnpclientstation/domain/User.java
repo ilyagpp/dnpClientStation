@@ -1,5 +1,6 @@
 package com.example.dnpclientstation.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -20,6 +21,7 @@ public class User implements UserDetails {
     private String username;
 
     @NotBlank(message = "Поле Пароль не может быть пустым")
+    @JsonIgnore
     private String password;
 
     private boolean active;
@@ -28,6 +30,11 @@ public class User implements UserDetails {
     @Email(message = "поле должно соответствовать типу: \"user@usermail.com\"")
     private String email;
     private String activationCode;
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
 
 
     public String getEmail() {
@@ -46,10 +53,7 @@ public class User implements UserDetails {
         this.activationCode = activationCode;
     }
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+
 
     public boolean isAdmin(){
         return roles.contains(Role.ADMIN);

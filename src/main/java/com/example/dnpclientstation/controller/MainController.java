@@ -1,10 +1,9 @@
 package com.example.dnpclientstation.controller;
 
-import com.example.dnpclientstation.domain.Client;
-import com.example.dnpclientstation.domain.Message;
-import com.example.dnpclientstation.domain.Price;
 import com.example.dnpclientstation.domain.User;
+import com.example.dnpclientstation.domain.*;
 import com.example.dnpclientstation.repositories.MessageRepo;
+import com.example.dnpclientstation.service.ClientService;
 import com.example.dnpclientstation.service.PriceService;
 import com.example.dnpclientstation.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,8 @@ public class MainController {
     TransactionService transactionService;
     @Autowired
     PriceService priceService;
+    @Autowired
+    ClientService clientService;
 
     @Autowired
     private MessageRepo messageRepo;
@@ -54,12 +55,12 @@ public class MainController {
 
     @PostMapping("/main")
     public String add(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal User aUser,
             @Valid Message message,
             BindingResult bindingResult,
             Model model){
 
-        message.setAuthor(user);
+        message.setAuthor(aUser);
 
         if (bindingResult.hasErrors()){
             Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
@@ -84,13 +85,14 @@ public class MainController {
                                Model model){
 
 
-        List<Price> priceList = priceService.getSetupList(creator);
+        List<Price> priceList = priceService.getPriceList(creator);
 
         model.addAttribute("priceList", priceList);
 
 
         if (search != null) {
-            Client client = transactionService.searchClientByCardNameEmailPhone(search);
+            Client client = clientService.searchClientByCardNameEmailPhone(search);
+            model.addAttribute(search);
             if (client != null) {
                 model.addAttribute("client", client);
             } else {
@@ -108,7 +110,7 @@ public class MainController {
     public String setUp(@AuthenticationPrincipal User creator,
                         @RequestParam String[] price,
                         @RequestParam String[] fuel,
-                        @RequestParam Long[] id,
+                        @RequestParam User[] id,
                         Model model){
 
         ControllerUtils.checkByComa(price);

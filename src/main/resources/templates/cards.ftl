@@ -1,15 +1,17 @@
 <#import "parts/common.ftl" as c>
-
+<#include "parts/security.ftl">
 <@c.page>
     <h5>Список карт зарегистрированных в системе</h5>
     <h5 style="color: firebrick">${nameList} </h5>
     <div class="form-row">
         <div class="form-inline" >
+            <#if isAdmin>
             <form method="post" class="form-inline" >
                 <input type="text" name="cardNumber" class="form-control" placeholder="1100000000000">
                 <input type="hidden" name="_csrf" value="${_csrf.token}">
                 <button class="btn btn-primary mr-2" type="submit">Добавить карту</button>
             </form>
+            </#if>
             <form method="get" class="form-inline">
                 <input type="number" name="size" class="form-control" placeholder="10">
                 <input type="hidden" name="free" value="'1'">

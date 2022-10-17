@@ -1,6 +1,9 @@
 package com.example.dnpclientstation.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(
@@ -14,12 +17,14 @@ public class ClientCard {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @NotBlank
     private String cardNumber;
 
     private Float bonus;
 
     @OneToOne
     @JoinColumn(name = "client_id")
+    @JsonIgnore
     private Client client;
 
     public ClientCard() {

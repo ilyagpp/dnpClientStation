@@ -3,13 +3,14 @@ package com.example.dnpclientstation.service;
 import com.example.dnpclientstation.domain.Client;
 import com.example.dnpclientstation.domain.ClientCard;
 import com.example.dnpclientstation.repositories.ClientRepo;
+import org.hibernate.id.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,8 +19,11 @@ public class ClientService {
     @Autowired
     ClientRepo clientRepo;
 
-    public Optional<Client> findById(Long id){
-       return clientRepo.findById(id);
+    @Autowired
+    CardService cardService;
+
+    public Optional<Client> findById(Long id) {
+        return clientRepo.findById(id);
     }
 
 
@@ -33,21 +37,24 @@ public class ClientService {
         return clientRepo.findByEmail(email);
     }
 
-    public Client findByClientCard(ClientCard clientCard){
+    public Client findByClientCard(ClientCard clientCard) {
 
-        return clientCard!=null? clientRepo.findByClientCard(clientCard): null;
+        return clientCard != null ? clientRepo.findByClientCard(clientCard) : null;
 
     }
+    public Client searchClientByCardNameEmailPhone(String search) {
 
-    public List<Client> findAll(){
+        Client client = search(search);
+        if (client != null) return client;
 
-        return clientRepo.findAll().stream().sorted(Comparator.comparing(Client::getId)).collect(Collectors.toList());
+        client = findByClientCard(cardService.findByCardNumber(search));
+        return client;
     }
+
 
     public List<Client> findAllByClientCardIsNullOrderById() {
         return clientRepo.findAllByClientCardIsNullOrderById();
     }
-
 
 
     public void save(Client client) {
@@ -62,12 +69,6 @@ public class ClientService {
         if (client != null) return client;
 
         client = clientRepo.findByEmail(search);
-        if (client != null) return client;
-
-        client = clientRepo.findBySurname(search);
-        if (client != null) return client;
-
-        client = clientRepo.findByName(search);
 
         return client;
     }
@@ -78,5 +79,66 @@ public class ClientService {
 
     public boolean checkPhoneNumber(String phoneNumber) {
         return clientRepo.findByPhoneNumber(phoneNumber) == null;
+    }
+
+    public boolean deleteById(Long id) {
+
+        Client client = findById(id).orElse(null);
+
+        if (client != null) {
+
+            if (client.getClientCard() != null) {
+
+                return false;
+
+            } else {
+
+                clientRepo.deleteById(id);
+                return true;
+
+            }
+        }
+
+        return false;
+
+
+    }
+
+    public Page<Client> findAll(Pageable pageable) {
+        return   clientRepo.findAll(pageable);
+    }
+
+    public boolean setNewPin(String pin, Client client){
+
+        if (pin.length() == 4 && client != null && !client.getPin().equals("NO") ) {
+            client.setPin(pin);
+            clientRepo.save(client);
+            return true;
+        } else return false;
+    }
+
+
+
+    public String getPinCode(Long id){
+        assert id != null;
+        Client bdClient = clientRepo.findById(id).orElse(new Client());
+        return bdClient.getPin();
+    }
+
+    public String pinGenerator(){
+        Random random = new Random();
+        return String.format("%04d", random.nextInt(10000));
+    }
+
+    public boolean changePin(String pin, Long id) {
+
+        Optional<Client> client = clientRepo.findById(id);
+        if (client.isPresent()){
+
+            client.get().setPin(pin);
+            clientRepo.save(client.get());
+            return true;
+        } else  return  false;
+
     }
 }

@@ -1,5 +1,7 @@
 package com.example.dnpclientstation.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -7,16 +9,15 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "clients")
 
-public class Client implements Persistable<Long>{
+public class Client implements Persistable<java.lang.Long>{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_generator")
     @SequenceGenerator(name="client_generator", sequenceName = "client_sequence", allocationSize = 1, initialValue = 1)
-    private Long id;
+    private java.lang.Long id;
 
 
     @NotBlank(message = "Поле не может быть пустым")
@@ -40,11 +41,11 @@ public class Client implements Persistable<Long>{
 
 
 
-    @Email(message = "поле должно соответствовать типу: \"user@usermail.com\"")
+    @Email(message = "поле должно соответствовать типу: \"aUser@usermail.com\"")
     @NotBlank(message = "Поле не может быть пустым")
     private String email;
 
-    @NotBlank(message = "Поле не может быть пустым")
+    @Length(min = 10, max = 10, message = "Длинна строго 10 цифр")
     private String phoneNumber;
 
     @ManyToOne
@@ -53,10 +54,16 @@ public class Client implements Persistable<Long>{
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    @JsonIgnore
+    private User aUser;
+
+    @JsonIgnore
+    private String pin;
+
+
 
     public User getUser() {
-        return user;
+        return aUser;
     }
 
     public ClientCard getClientCard() {
@@ -65,11 +72,16 @@ public class Client implements Persistable<Long>{
 
 
     @Override
-    public Long getId() {
+    public java.lang.Long getId() {
         return id;
     }
 
+    public void setId(java.lang.Long id) {
+        this.id = id;
+    }
+
     @Override
+    @JsonIgnore
     public boolean isNew() {
         return id == null;
     }
@@ -77,7 +89,7 @@ public class Client implements Persistable<Long>{
     public Client() {
     }
 
-    public Client(Long id, String name, String surname, String patronymic, Sex sex, Date birthday, LocalDateTime added, boolean active, String email, String phoneNumber, ClientCard clientCard, User user) {
+    public Client(java.lang.Long id, String name, String surname, String patronymic, Sex sex, Date birthday, LocalDateTime added, boolean active, String email, String phoneNumber, ClientCard clientCard, User aUser) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -89,7 +101,7 @@ public class Client implements Persistable<Long>{
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.clientCard = clientCard;
-        this.user = user;
+        this.aUser = aUser;
     }
 
     public String getName() {
@@ -117,7 +129,23 @@ public class Client implements Persistable<Long>{
     }
 
     public String getSex() {
-        return sex.getSex();
+        String getSex;
+        try {
+            getSex = sex.getSex();
+        }catch (Exception e){
+            getSex = "unknown";
+        }
+
+        return getSex;
+    }
+
+    public String getPin() {
+
+        return pin != null? pin: "NO";
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
     }
 
     public void setSex(Sex sex) {
@@ -168,7 +196,7 @@ public class Client implements Persistable<Long>{
         this.clientCard = clientCard;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(User aUser) {
+        this.aUser = aUser;
     }
 }

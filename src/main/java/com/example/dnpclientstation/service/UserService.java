@@ -5,6 +5,7 @@ import com.example.dnpclientstation.domain.User;
 import com.example.dnpclientstation.repositories.CardRepo;
 import com.example.dnpclientstation.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +18,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
+
+    @Value("${rootURL}")
+    private String rootUrl;
+
+    @Value("${rootPort}")
+    private String rootPort;
+
     @Autowired
     private UserRepo userRepo;
 
@@ -34,18 +42,24 @@ public class UserService implements UserDetailsService {
 
 
         User user = userRepo.findByUsername(username);
-        if (user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("Пользователь не найден!");
         }
 
         return user;
     }
 
-    public boolean addUser(User user){
+    public int addUser(User user) {
         User userFromDb = userRepo.findByUsername(user.getUsername());
 
-        if(userFromDb != null){
-            return false;
+        if (userFromDb != null) {
+            return -1;
+        }
+
+        userFromDb = userRepo.findByEmail(user.getEmail());
+
+        if (userFromDb != null) {
+            return -2;
         }
 
         user.setActive(false);
@@ -55,18 +69,19 @@ public class UserService implements UserDetailsService {
 
         userRepo.save(user);
 
-        sendMessage(user);
+        sendRegistrationMessage(user);
 
-        return true;
+        return 0;
     }
 
-    private void sendMessage(User user) {
-        if(!StringUtils.isEmpty(user.getEmail())){
+    private void sendRegistrationMessage(User user) {
+        if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
-                    "Hello, %s! \n" +
-                            "Welcome to DNP Client!. Please, visit next link :" +
-                            "http://localhost:8080/activate/%s",
+                    "Поздравлем, %s! \n" +
+                            "Теперь вы часть Бонусной системы «АЗС ДОРИСС», для активации вашего профиля необходимо перейти по ссылке:" +
+                            "http://%s/activate/%s",
                     user.getUsername(),
+                    url(rootUrl, rootPort),
                     user.getActivationCode()
             );
 
@@ -74,9 +89,22 @@ public class UserService implements UserDetailsService {
         }
     }
 
+
+    static String url(String rootUrl, String rootPort) {
+        if (rootPort == null) return rootUrl;
+
+        return rootPort.isEmpty() ? rootUrl : rootUrl + ":" + rootPort;
+
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepo.findById(id);
+    }
+
+
     public boolean activateUser(String code) {
         User user = userRepo.findByActivationCode(code);
-        if (user == null){
+        if (user == null) {
             return false;
         }
 
@@ -101,8 +129,8 @@ public class UserService implements UserDetailsService {
 
         user.getRoles().clear();
 
-        for(String key : form.keySet()){
-            if (roles.contains(key)){
+        for (String key : form.keySet()) {
+            if (roles.contains(key)) {
                 user.getRoles().add(Role.valueOf(key));
             }
         }
@@ -115,20 +143,20 @@ public class UserService implements UserDetailsService {
         boolean isEmailChanged = (email != null && !email.equals(userEmail)) ||
                 (userEmail != null && !userEmail.equals(email));
 
-        if (isEmailChanged){
+        if (isEmailChanged) {
             user.setEmail(email);
-            if (!StringUtils.isEmpty(email)){
+            if (!StringUtils.isEmpty(email)) {
                 user.setActivationCode(UUID.randomUUID().toString());
             }
         }
 
-        if (!StringUtils.isEmpty(password)){
+        if (!StringUtils.isEmpty(password)) {
             user.setPassword(password);
         }
 
         userRepo.save(user);
-        if(isEmailChanged) {
-            sendMessage(user);
+        if (isEmailChanged) {
+            sendRegistrationMessage(user);
         }
     }
 }

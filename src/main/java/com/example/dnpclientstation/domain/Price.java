@@ -11,7 +11,7 @@ public class Price {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "price_generator")
     @SequenceGenerator(name="price_generator", sequenceName = "price_sequence", allocationSize = 1, initialValue = 1)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private java.lang.Long id;
 
     @Column(name = "fuel")
     private String fuel;
@@ -27,7 +27,7 @@ public class Price {
     public Price() {
     }
 
-    public Price(Long id, String fuel, Float price, User creator) {
+    public Price(java.lang.Long id, String fuel, Float price, User creator) {
         this.id = id;
         this.fuel = fuel;
         this.price = price;
@@ -35,11 +35,11 @@ public class Price {
     }
 
 
-    public Long getId() {
+    public java.lang.Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(java.lang.Long id) {
         this.id = id;
     }
 

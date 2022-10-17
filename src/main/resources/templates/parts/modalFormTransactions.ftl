@@ -1,7 +1,5 @@
 <#import "fuel.ftl" as fuel>
 <#macro formtransaction>
-
-
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -18,7 +16,6 @@
                         <#if client??>
                         <input class="form-control" type="text" name="clientCard" value="<#if client.clientCard??>${client.clientCard.cardNumber}</#if>" placeholder="<#if client.clientCard??>${client.clientCard.cardNumber!}<#else>Карта не выдана</#if> "
                                readonly>
-                            <#else ><input type="text" class="form-control" name="clientCard" oninput="changeHandler(this)" >
                         </#if>
                     </div>
 
@@ -90,7 +87,6 @@
                             <#if client??>
                                 <input class="form-control" type="text" name="clientCard" value="<#if client.clientCard??>${client.clientCard.cardNumber}</#if>" placeholder="<#if client.clientCard??>${client.clientCard.cardNumber!}<#else>Карта не выдана</#if> "
                                        readonly>
-                            <#else ><input type="text" class="form-control" name="clientCard" oninput="changeHandler(this)" >
                             </#if>
                         </div>
                         <div class="form-group">
@@ -119,6 +115,10 @@
                             <input type="text" class="form-control" name="bonus" oninput="changeHandler(this)" >
                         </div>
                         <div class="form-group">
+                            <input class="col-sm-2 form-control" type="text" maxlength="4" id ="pin" name="pin" placeholder="****" oninput="changeHandler(this)">
+                            <small id="pin" class="form-text text-muted">Пин-код</small>
+                        </div>
+                        <div class="form-group">
                             <h5 style="color: red">"Заполнять очень внимательно!"</h5>
                         </div>
                         <div class="form-group">
@@ -137,4 +137,7 @@
             </div>
         </div>
     </div>
+
+
+
 </#macro>

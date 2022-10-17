@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +15,8 @@ public interface TransactionsRepo extends JpaRepository<FuelTransaction, Long> {
 
 
     Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+    Page<FuelTransaction> findByCreateDateTimeBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     List<FuelTransaction> findByCreatorIdAndCreateDateTimeBetweenOrderByIdDesc(Long id, LocalDateTime start, LocalDateTime end);
 

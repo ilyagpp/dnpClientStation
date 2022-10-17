@@ -26,10 +26,4 @@ alter table if exists client_card
     add constraint client_card_uniq
         unique (card_number);
 
-alter table if exists client_card
-    add constraint client_card_clients_fk
-        foreign key (client_id) references clients;
 
-alter table if exists fuel_transaction
-    add constraint fuel_transaction_users_fc
-        foreign key (creator_id) references users;

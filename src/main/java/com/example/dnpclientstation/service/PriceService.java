@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PriceService {
@@ -22,10 +23,10 @@ public class PriceService {
         return priceRepo.findAllByCreatorId(creatorId);
     }
 
-    public boolean saveOrUpdate(Price price, Long creatorId) {
+    public boolean saveOrUpdate(Price price, User creator) {
 
         try {
-            Price dbPrice = findByCreatorIdAndFuel(creatorId, price.getFuel());
+            Price dbPrice = findByCreatorIdAndFuel(creator, price.getFuel());
             if (!dbPrice.isNew()) {
                 price.setId(dbPrice.getId());
             }
@@ -36,26 +37,33 @@ public class PriceService {
         }
     }
 
-    private Price findByCreatorIdAndFuel(Long creatorId, String fuel) {
-        return priceRepo.findByCreatorIdAndFuel(creatorId, fuel);
+    private Price findByCreatorIdAndFuel(User creator, String fuel) {
+        return priceRepo.findByCreatorIdAndFuel(creator.getId(), fuel);
     }
 
-    public List<Price> getSetupList(User creator){
-        List<Price> priceList = new ArrayList<>();
+    public List<Price> getPriceList(User creator) {
 
-            for (Fuel fuel: Fuel.values()){
+        List<Price> priceList = new ArrayList<>(priceRepo.findAllByCreatorId(creator.getId()));
 
-                Price price = priceRepo.findByCreatorIdAndFuel(creator.getId(), fuel.getFuelType());
-                if (price != null){
-                    priceList.add(price);
-                }else {
+        List<String> prices = priceList.stream().map(Price::getFuel).collect(Collectors.toList());
+
+        if (priceList.size() != Fuel.values().length) {
+
+            for (Fuel fuel : Fuel.values()) {
+
+                if (!prices.contains(fuel.getFuelType())) {
+
                     priceList.add(new Price(null, fuel.getFuelType(), 00.00f, creator));
+
                 }
+
             }
+        }
+
         return priceList;
     }
 
-    public boolean setUpPriceList(Long[] id, String[] fuel, String[] price, User creator) {
+    public boolean setUpPriceList(User[] id, String[] fuel, String[] price, User creator) {
         try {
             for (int i = 0; i<fuel.length; i++){
                 if (price[i] != null && !price[i].equals("")){

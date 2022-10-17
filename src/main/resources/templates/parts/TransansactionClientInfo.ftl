@@ -10,7 +10,7 @@
 
             <form method="get" class="form-inline">
                 <input class="form-control mr-sm-2" type="search" name="search" id="search"
-                       placeholder="номер/email/имя" aria-label="Search">
+                       placeholder="номер/email" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Найти</button>
             </form>
         </div>

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.lang.Long;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,15 +39,14 @@ public class TransactionService {
         return transactionsRepo.findById(id);
     }
 
-    public List<FuelTransaction> getAll() {
-        return transactionsRepo.findAll();
+
+
+    public List<FuelTransaction> findByCreatorId(Long id) {
+        return transactionsRepo.findByCreatorId(id);
     }
 
-    public List<FuelTransaction> findByCreatorId(User user) {
-        return transactionsRepo.findByCreatorId(user.getId());
-    }
 
-    public Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(User user, String start, String end, Pageable pageable) {
+    public Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, String start, String end, Pageable pageable, boolean showAll) {
 
         LocalDateTime startTime;
         if (StringUtils.isEmpty(start)) {
@@ -63,19 +63,23 @@ public class TransactionService {
             endTime = LocalDateTime.parse(end);
         }
 
+        if (showAll){
+            return transactionsRepo.findByCreateDateTimeBetween(startTime, endTime, pageable);
+        } else {
 
-        return transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(user.getId(), startTime, endTime, pageable);
+            return transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(id, startTime, endTime, pageable);
+        }
     }
 
 
     @Transactional(readOnly = false)
-    public boolean createOrUpdateTransaction(Long id, String cardNumber, String fuel, Float volume, Float price, User creator) {
+    public FuelTransaction createOrUpdateTransaction(Long id, String cardNumber, String fuel, Float volume, Float price, User creator) {
 
         ClientCard clientCard = cardService.findByCardNumber(cardNumber);
 
 
-        if (clientCard == null || volume == 0.0f) {
-            return false;
+        if (clientCard == null || volume <= 0.0f || creator == null) {
+            return null;
         }
 
 
@@ -93,22 +97,19 @@ public class TransactionService {
                 transaction.setFuel(FuelUtil.convert(fuel));
             }
 
-            if (volume != null) {
-                transaction.setVolume(volume);
-            }
+            transaction.setVolume(volume);
 
             if (price != null) {
                 transaction.setPrice(price);
             }
 
-            if (price != null || volume != null) {
-
-                transaction.setTotal(getTotal(transaction.getVolume(), transaction.getPrice()));
-            }
+            transaction.setTotal(getTotal(transaction.getVolume(), transaction.getPrice()));
 
             transaction.setUpdateDateTime(LocalDateTime.now());
 
             transaction.setBonus(getTotal(transaction.getVolume(), transaction.getPrice()) * getBonusPercent());
+
+            transaction.setCreator(creator);
 
         } else {
             transaction = new FuelTransaction();
@@ -123,9 +124,9 @@ public class TransactionService {
             transaction.setCreator(creator);
         }
         clientCard.setBonus(clientCard.getBonus() + transaction.getBonus());
-        transactionsRepo.save(transaction);
         cardService.save(clientCard);
-        return true;
+
+        return transactionsRepo.save(transaction);
     }
 
     public Float getTotal(Float volume, Float price) {
@@ -141,7 +142,7 @@ public class TransactionService {
     }
 
 
-    public Optional<Client> findClientById(Long id){
+    public Optional<Client> findClientById(java.lang.Long id){
        return clientService.findById(id);
     }
 
@@ -149,14 +150,7 @@ public class TransactionService {
         return cardService.findByCardNumber(cardNumber);
     }
 
-    public Client searchClientByCardNameEmailPhone(String search) {
 
-        Client client = clientService.search(search);
-        if (client != null) return client;
-
-        client = clientService.findByClientCard(cardService.findByCardNumber(search));
-        return client;
-    }
 
 
     public List<Price> getPriceListByCreatorId(Long creatorId){
@@ -164,26 +158,102 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = false)
-    public int useBonus(String fuel, String clientCard, Float bonus, Float price, User creator) {
+    public FuelTransaction useBonus(Long id, String fuel, String clientCard, Float bonus, Float price, User creator) {
+
+
         ClientCard card = cardService.findByCardNumber(clientCard);
-        if (card.getBonus()>= bonus){
-            FuelTransaction useBonusTransaction = new FuelTransaction();
-            useBonusTransaction.setCreator(creator);
-            useBonusTransaction.setBonus(bonus * -1);
-            useBonusTransaction.setClientCard(clientCard);
-            useBonusTransaction.setCreateDateTime(LocalDateTime.now());
-            useBonusTransaction.setUpdateDateTime(LocalDateTime.now());
-            useBonusTransaction.setPrice(price);
-            useBonusTransaction.setVolume(getVolume(bonus,price));
-            useBonusTransaction.setTotal(bonus);
-            useBonusTransaction.setFuel(FuelUtil.convert(fuel));
 
-            card.setBonus(card.getBonus() - bonus);
+        if (id != null) {
+            FuelTransaction updateUseBonusTransaction = transactionsRepo.getOne(id);
+            card.setBonus(bonus +(updateUseBonusTransaction.getBonus()* -1));
+            if (card.getBonus() >= bonus){
 
-            transactionsRepo.save(useBonusTransaction);
-            cardService.save(card);
-            return 1;//all operation completed;
+                updateUseBonusTransaction.setBonus(bonus * -1);
+                updateUseBonusTransaction.setFuel(FuelUtil.convert(fuel));
+                updateUseBonusTransaction.setPrice(price);
+                updateUseBonusTransaction.setUpdateDateTime(LocalDateTime.now());
+                updateUseBonusTransaction.setVolume(getVolume(bonus, price));
+                updateUseBonusTransaction.setTotal(bonus);
+
+                card.setBonus(card.getBonus() - bonus);
+
+                cardService.save(card);
+                return transactionsRepo.save(updateUseBonusTransaction);
+
+            }
+            return null;
+
+
+        } else {
+
+            if (card.getBonus() >= bonus) {
+                FuelTransaction useBonusTransaction = new FuelTransaction();
+                useBonusTransaction.setCreator(creator);
+                useBonusTransaction.setBonus(bonus * -1);
+                useBonusTransaction.setClientCard(clientCard);
+                useBonusTransaction.setCreateDateTime(LocalDateTime.now());
+                useBonusTransaction.setUpdateDateTime(LocalDateTime.now());
+                useBonusTransaction.setPrice(price);
+                useBonusTransaction.setVolume(getVolume(bonus, price));
+                useBonusTransaction.setTotal(bonus);
+                useBonusTransaction.setFuel(FuelUtil.convert(fuel));
+
+                card.setBonus(card.getBonus() - bonus);
+
+                cardService.save(card);
+                return transactionsRepo.save(useBonusTransaction);
+            }
+            return null;
         }
-        return -1; //not enough bonuses
+    }
+
+    @Transactional(readOnly = false)
+    public int deleteById(Long id) {
+
+         boolean result = restoreBeforeDelete(id);
+
+         if (result){
+             transactionsRepo.deleteById(id);
+             return 0;
+         } else return -1;
+
+    }
+
+    @Transactional(readOnly = false)
+    public boolean restoreBeforeDelete(Long id){
+
+
+        FuelTransaction transaction = transactionsRepo.getOne(id);
+
+        if (transaction.getId() == null){
+            return false;
+        }
+
+        ClientCard clientCard = cardService.findByCardNumber(transaction.getClientCard());
+
+        float bonus = 0.0f;
+
+        if (transaction.getBonus() >= 0) {
+
+            bonus = transaction.getBonus() + clientCard.getBonus();
+
+        } else {
+
+            bonus = transaction.getBonus() * -1 + clientCard.getBonus();
+        }
+
+        clientCard.setBonus(bonus);
+        cardService.save(clientCard);
+        return true;
+    }
+
+    public boolean checkPin(String clientCard, String pin) {
+
+        Client client = clientService.findByClientCard(cardService.findByCardNumber(clientCard));
+
+        if(client == null){
+            return false;
+        }
+        return client.getPin().equals(pin);
     }
 }

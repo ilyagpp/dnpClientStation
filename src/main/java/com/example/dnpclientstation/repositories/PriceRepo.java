@@ -1,7 +1,7 @@
 package com.example.dnpclientstation.repositories;
 
+
 import com.example.dnpclientstation.domain.Price;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

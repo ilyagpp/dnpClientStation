@@ -34,7 +34,7 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String addUser(
             @RequestParam("password2") String passwordConfirm,
-            @Valid User user,
+            @Valid User aUser,
             BindingResult bindingResult,
             Client client,
             Model model) {
@@ -44,7 +44,7 @@ public class RegistrationController {
             model.addAttribute("password2Error", "Поле не может быть пустым");
         }
 
-        if (user.getPassword() != null && !user.getPassword().equals(passwordConfirm)){
+        if (aUser.getPassword() != null && !aUser.getPassword().equals(passwordConfirm)){
             model.addAttribute("passwordError", "Пароли не совпадают");
         }
 
@@ -55,13 +55,21 @@ public class RegistrationController {
             return "registration";
         }
 
-        if (!userService.addUser(user)){
-           model.addAttribute("usernameError", "User exists!");
-           return "registration";
+        switch (userService.addUser(aUser)){
+            case -1:
+                model.addAttribute("usernameError", "Пользователь уже существует!");
+                return "registration";
+
+            case -2:
+                model.addAttribute("emailError", "Пользователь c данным email уже существует!");
+                return "registration";
+
+            case 0:
+                return "redirect:/login";
+
+            default: return "error";
         }
 
-
-        return "redirect:/login";
     }
 
     @GetMapping("/activate/{code}")

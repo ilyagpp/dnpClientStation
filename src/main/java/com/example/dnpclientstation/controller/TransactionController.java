@@ -1,9 +1,7 @@
 package com.example.dnpclientstation.controller;
 
-import com.example.dnpclientstation.domain.Client;
-import com.example.dnpclientstation.domain.FuelTransaction;
-import com.example.dnpclientstation.domain.Price;
-import com.example.dnpclientstation.domain.User;
+
+import com.example.dnpclientstation.domain.*;
 import com.example.dnpclientstation.service.TransactionService;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,17 +9,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.constraints.NotBlank;
+import java.lang.Long;
 import java.util.List;
+
 
 @Controller
 public class TransactionController {
@@ -34,6 +33,8 @@ public class TransactionController {
                                @RequestParam(required = false) String end,
                                @RequestParam(required = false) String search,
                                @RequestParam(required = false) String clientId,
+                               @RequestParam(required = false) String showAll,
+                               @RequestParam(required = false) Integer size,
                                @AuthenticationPrincipal User creator,
                                Model model,
                                @RequestHeader(required = false) String referer,
@@ -41,13 +42,23 @@ public class TransactionController {
 
 
 
-
         String url = "/transactions";
-                if (referer.contains("transactions")){
+
+        if (showAll != null || referer.contains("showAll=true")) {
+            model.addAttribute("showAll", showAll);
+
+            url = url + "?showAll=true";
+
+        }
+
+
+        if (referer.contains("transactions")) {
             if (!StringUtils.isEmpty(start)) {
                 model.addAttribute("start", start);
-                if (!url.contains(start)) {
+                if (!url.contains(start) && !url.contains("?")) {
                     url = url + "?start=" + start;
+                } else {
+                    url = url + "&start=" + start;
                 }
             }
             if (!StringUtils.isEmpty(end)) {
@@ -55,39 +66,19 @@ public class TransactionController {
                 if (!url.contains(end)) {
                     if (url.contains("?")) {
                         url = url + "&end=" + end;
-                    }else url = url + "?end=" + end;
+                    } else url = url + "?end=" + end;
                 }
             }
 
         }
+        ControllerUtils.initPageSize(model, size, pageable);
         model.addAttribute("url", url);
-        Page<FuelTransaction> fuelTransactionPage = transactionService.findByCreatorIdAndCreateDateTimeBetween(creator, start, end, pageable);
+        Page<FuelTransaction> fuelTransactionPage = transactionService.findByCreatorIdAndCreateDateTimeBetween(creator.getId(), start, end, pageable, Boolean.parseBoolean(showAll));
         model.addAttribute("page", fuelTransactionPage);
 
 
-
-        Client client;
-        if (search != null) {
-            client = transactionService.searchClientByCardNameEmailPhone(search);
-            if (client != null) {
-                model.addAttribute("client", client);
-            } else {
-                model.addAttribute("clientError", String.format("по запросу %s данные в системе отсутствуют", search));
-            }
-        }
-
-        if (clientId != null) {
-            client = transactionService.findClientById(Long.valueOf(clientId)).orElse(null);
-            if (client != null) {
-                model.addAttribute("client", client);
-            }
-        }
-
-        List<Price> priceList = transactionService.getPriceListByCreatorId(creator.getId());
-        if (priceList != null) {
-            model.addAttribute("priceList", priceList);
-        }
         return "transactions";
+
     }
 
 
@@ -111,8 +102,8 @@ public class TransactionController {
 
 
             if (price == 0) {
-                model.addAttribute("priceError", "Цена не может быть нулевой");
-                return "redirect:/transactions";
+                model.addAttribute("error", "Цена не может быть нулевой");
+                return "error";
             }
 
             float total;
@@ -130,34 +121,92 @@ public class TransactionController {
 
             transactionService.createOrUpdateTransaction(id, clientCard, fuelA, volume, price, creator);
 
-        } else model.addAttribute("volumeError", "Вы забыли ввести объем");
+        } else model.addAttribute("error", "Вы забыли ввести объем");
         return "redirect:/transactions";
     }
 
     @PostMapping("/transaction/use")
     public String useBonus(@AuthenticationPrincipal User creator,
                            Model model,
+                           @RequestParam (required = false) Long id,
                            @RequestParam @NotBlank String fuel,
                            @RequestParam String clientCard,
-                           @RequestParam String bonus) {
+                           @RequestParam (required = false) String pin,
+                           @RequestParam String bonus,
+                           @RequestHeader(required = false) String referer) {
 
+        boolean checkPin;
 
-        if (bonus != null && !bonus.equals("")) {
-            bonus = ControllerUtils.checkByСomma(bonus);
-            String[] input = fuel.split(" -> ");
-            String fuelA = ControllerUtils.checkByСomma(input[0]);
-            Float price = Float.valueOf(ControllerUtils.checkByСomma(input[1]));
-
-            int result = transactionService.useBonus(fuelA, clientCard, Float.valueOf(bonus), price, creator);
-
-            if (result == 1) {
-                model.addAttribute("transactionComplete", "Успешно!");
-            }
-            model.addAttribute("transactionError", "На карте недостаточно бонусов для списания!");
-
+        if (id != null){
+            checkPin = true;
+        } else {
+            checkPin = transactionService.checkPin(clientCard,pin);
         }
 
-        return "redirect:/transactions";
+        if (checkPin) {
+
+            if (bonus != null && !bonus.equals("")) {
+                bonus = ControllerUtils.checkByСomma(bonus);
+                String[] input = fuel.split(" -> ");
+                String fuelA = ControllerUtils.checkByСomma(input[0]);
+                Float price = Float.valueOf(ControllerUtils.checkByСomma(input[1]));
+
+                FuelTransaction transaction = transactionService.useBonus(id, fuelA, clientCard, Float.valueOf(bonus), price, creator);
+
+                if (transaction != null) {
+                    model.addAttribute("transactionComplete", "Успешно!");
+                } else {
+                    model.addAttribute("error", "На карте недостаточно бонусов для списания!");
+                    return "error";
+                }
+            }
+
+            return "redirect:/transactions";
+        } else {
+            model.addAttribute("error", "Неверный пин!");
+            model.addAttribute("referer",referer);
+            return "error";
+        }
+
+    }
+
+    @GetMapping("transactions/edit/{id}")
+    public String editTransaction(@AuthenticationPrincipal User creator,
+                                  @PathVariable String id,
+                                  Model model,
+                                  RedirectAttributes redirectAttributes,
+                                  @RequestHeader(required = false) String referer) {
+
+        FuelTransaction fuelTransaction = transactionService.findFuelTransactionById(Long.valueOf(id)).orElse(null);
+        model.addAttribute("editTransaction", fuelTransaction);
+        assert fuelTransaction != null;
+        ClientCard card = transactionService.getClientCardByCardNumber(fuelTransaction.getClientCard());
+        model.addAttribute("bonus", (fuelTransaction.getBonus() - card.getBonus())* -1);
+
+        List<Price> priceList = transactionService.getPriceListByCreatorId(creator.getId());
+        if (priceList != null) {
+            model.addAttribute("priceList", priceList);
+        }
+        return "editTransactform";
+    }
+
+
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping("transactions/delete/{id}")
+    public String deleteTransaction(@AuthenticationPrincipal User user,
+                                    @PathVariable Long id,
+                                    Model model,
+                                    @RequestHeader(required = false) String referer
+    ){
+
+          int result =  transactionService.deleteById(id);
+          if (result == -1){
+              model.addAttribute("error", "Удаление невозможно! Попробуйте снова, или обратитесь к Администратору системы.");
+
+              return "error";
+          } else
+              return "redirect:"+ referer;
 
     }
 }

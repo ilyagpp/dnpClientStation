@@ -20,6 +20,14 @@ alter table if exists clients
     add constraint clients_uniq
         unique (email, phone_number, user_id);
 
+alter table if exists client_card
+    add constraint client_card_clients_fk
+        foreign key (client_id) references clients;
+
+alter table if exists fuel_transaction
+    add constraint fuel_transaction_users_fc
+        foreign key (creator_id) references users;
+
 alter table if exists clients
     add constraint clients_users_fk
         foreign key (user_id) references users;

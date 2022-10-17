@@ -14,7 +14,7 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "msg_generator")
     @SequenceGenerator(name="msg_generator", sequenceName = "msg_seq", allocationSize = 1, initialValue = 1)
-    private Long id;
+    private java.lang.Long id;
 
     @NotBlank(message = "Поле не может быть пустым")
     @Length(max = 255, message = "максимально 255 символов")
@@ -30,10 +30,10 @@ public class Message {
     public Message() {
     }
 
-    public Message(String text, String tag, User user) {
+    public Message(String text, String tag, User aUser) {
         this.text = text;
         this.tag = tag;
-        this.author = user;
+        this.author = aUser;
     }
 
     public String getAuthorName(){
@@ -48,11 +48,11 @@ public class Message {
         this.author = author;
     }
 
-    public Long getId() {
+    public java.lang.Long getId() {
         return id;
     }
 
-    public void setId(Long id){
+    public void setId(java.lang.Long id){
         this.id = id;
     }
 

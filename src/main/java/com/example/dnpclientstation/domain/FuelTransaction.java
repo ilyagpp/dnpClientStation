@@ -61,18 +61,6 @@ public class FuelTransaction implements Persistable<Long> {
         this.creator = creator;
     }
 
-    public User getCreator() {
-        return creator;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
-    }
 
     public void setId(Long id) {
         this.id = id;
@@ -92,10 +80,6 @@ public class FuelTransaction implements Persistable<Long> {
 
     public void setUpdateDateTime(LocalDateTime updateDateTime) {
         this.updateDateTime = updateDateTime;
-    }
-
-    public void setClientCard(String clientCard) {
-        this.clientCard = clientCard;
     }
 
     public String getFuel() {
@@ -130,8 +114,8 @@ public class FuelTransaction implements Persistable<Long> {
         this.total = total;
     }
 
-    public void setCreator(User creator) {
-        this.creator = creator;
+    public void setClientCard(String clientCard) {
+        this.clientCard = clientCard;
     }
 
     public Float getBonus() {
@@ -140,6 +124,24 @@ public class FuelTransaction implements Persistable<Long> {
 
     public void setBonus(Float bonus) {
         this.bonus = bonus;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return id == null;
     }
 
     @Override
@@ -152,20 +154,26 @@ public class FuelTransaction implements Persistable<Long> {
         if (Float.compare(that.getPrice(), getPrice()) != 0) return false;
         if (Float.compare(that.getVolume(), getVolume()) != 0) return false;
         if (Float.compare(that.getTotal(), getTotal()) != 0) return false;
-        if (!getId().equals(that.getId())) return false;
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (!getCreateDateTime().equals(that.getCreateDateTime())) return false;
-        if (getFuel() != that.getFuel()) return false;
+        if (!getUpdateDateTime().equals(that.getUpdateDateTime())) return false;
+        if (!getFuel().equals(that.getFuel())) return false;
+        if (!getClientCard().equals(that.getClientCard())) return false;
+        if (!getBonus().equals(that.getBonus())) return false;
         return getCreator().equals(that.getCreator());
     }
 
     @Override
     public int hashCode() {
-        int result = getId().hashCode();
+        int result = getId() != null ? getId().hashCode() : 0;
         result = 31 * result + getCreateDateTime().hashCode();
+        result = 31 * result + getUpdateDateTime().hashCode();
         result = 31 * result + getFuel().hashCode();
         result = 31 * result + (getPrice() != +0.0f ? Float.floatToIntBits(getPrice()) : 0);
         result = 31 * result + (getVolume() != +0.0f ? Float.floatToIntBits(getVolume()) : 0);
         result = 31 * result + (getTotal() != +0.0f ? Float.floatToIntBits(getTotal()) : 0);
+        result = 31 * result + getClientCard().hashCode();
+        result = 31 * result + getBonus().hashCode();
         result = 31 * result + getCreator().hashCode();
         return result;
     }

@@ -13,18 +13,9 @@
             <li class="nav-item">
                 <a class="nav-link" aria-current="page" href= "
                 <#if isAdmin || isAzsAdmin>/main-operator<#else>/</#if>
-                "> Домой</a>
+                ">Главная</a>
             </li>
-            <#if isAdmin>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/user">Список пользователей</a>
-                </li>
-            </#if>
-            <#if isAdmin  || isAzsAdmin>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/user/profile">Профиль</a>
-                </li>
-            </#if>
+
             <#if isAdmin || isAzsAdmin>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" aria-current="page"  href="#" id="CardWorkingSpace" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -33,7 +24,7 @@
                     <div class="dropdown-menu" aria-labelledby="CardWorkingSpace">
                         <a class="dropdown-item" href="/clients">Клиенты</a>
                         <a class="dropdown-item" href="/client/new">Создать</a>
-                        <a class="dropdown-item" href="/client/edit">Редактировать</a>
+                        <a class="dropdown-item" href="/clients/pin">Пин-Коды</a>
                     </div>
                 </li>
             </#if>
@@ -49,9 +40,17 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="CardWorkingSpace">
                         <a class="dropdown-item" href="/cards">Список карт</a>
-                        <a class="dropdown-item" href="/cards/issue">Выдать</a>
-
                     </div>
+                </li>
+            </#if>
+            <#if isAdmin>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/user">Список пользователей</a>
+                </li>
+            </#if>
+            <#if isAdmin  || isAzsAdmin>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/user/profile">Профиль</a>
                 </li>
             </#if>
             <li class="nav-item">
@@ -61,7 +60,7 @@
 
         <span class="form-inline my-2 my-lg-0">
             <div class="navbar-text mr-sm-2">${name}</div>
-            <#if user??> <@l.logout /> <#else>
+            <#if aUser??> <@l.logout /> <#else>
                 <a class="btn btn-success" href="/main" role="link">Авторизация</a></#if>
         </span>
 
