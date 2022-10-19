@@ -1,6 +1,7 @@
 package com.example.dnpclientstation.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.Persistable;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
+@Table (name = "fuel_transaction")
 public class FuelTransaction implements Persistable<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trans_generator")
@@ -34,16 +36,19 @@ public class FuelTransaction implements Persistable<Long> {
 
     @NotBlank
     @Length(max = 13)
-    private String clientCard;
+    @Column(name = "client_card")
+    private String cardNumber;
 
     private Float bonus;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")
+    @JsonIgnoreProperties({"password", "active", "email", "activationCode", "roles", "enabled", "admin", "azsAdmin",
+            "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
     private User creator;
 
-    public String getClientCard() {
-        return clientCard;
+    public String getCardNumber() {
+        return cardNumber;
     }
 
 
@@ -61,6 +66,18 @@ public class FuelTransaction implements Persistable<Long> {
         this.creator = creator;
     }
 
+    public FuelTransaction(Long id, LocalDateTime createDateTime, LocalDateTime updateDateTime, String fuel, float price, float volume, float total, String cardNumber, Float bonus, User creator) {
+        this.id = id;
+        this.createDateTime = createDateTime;
+        this.updateDateTime = updateDateTime;
+        this.fuel = fuel;
+        this.price = price;
+        this.volume = volume;
+        this.total = total;
+        this.cardNumber = cardNumber;
+        this.bonus = bonus;
+        this.creator = creator;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -114,8 +131,8 @@ public class FuelTransaction implements Persistable<Long> {
         this.total = total;
     }
 
-    public void setClientCard(String clientCard) {
-        this.clientCard = clientCard;
+    public void setCardNumber(String clientCard) {
+        this.cardNumber = clientCard;
     }
 
     public Float getBonus() {
@@ -158,7 +175,7 @@ public class FuelTransaction implements Persistable<Long> {
         if (!getCreateDateTime().equals(that.getCreateDateTime())) return false;
         if (!getUpdateDateTime().equals(that.getUpdateDateTime())) return false;
         if (!getFuel().equals(that.getFuel())) return false;
-        if (!getClientCard().equals(that.getClientCard())) return false;
+        if (!getCardNumber().equals(that.getCardNumber())) return false;
         if (!getBonus().equals(that.getBonus())) return false;
         return getCreator().equals(that.getCreator());
     }
@@ -172,7 +189,7 @@ public class FuelTransaction implements Persistable<Long> {
         result = 31 * result + (getPrice() != +0.0f ? Float.floatToIntBits(getPrice()) : 0);
         result = 31 * result + (getVolume() != +0.0f ? Float.floatToIntBits(getVolume()) : 0);
         result = 31 * result + (getTotal() != +0.0f ? Float.floatToIntBits(getTotal()) : 0);
-        result = 31 * result + getClientCard().hashCode();
+        result = 31 * result + getCardNumber().hashCode();
         result = 31 * result + getBonus().hashCode();
         result = 31 * result + getCreator().hashCode();
         return result;

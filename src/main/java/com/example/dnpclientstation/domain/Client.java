@@ -55,7 +55,7 @@ public class Client implements Persistable<java.lang.Long>{
     @OneToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private User aUser;
+    private User user;
 
     @JsonIgnore
     private String pin;
@@ -63,7 +63,7 @@ public class Client implements Persistable<java.lang.Long>{
 
 
     public User getUser() {
-        return aUser;
+        return user;
     }
 
     public ClientCard getClientCard() {
@@ -89,7 +89,7 @@ public class Client implements Persistable<java.lang.Long>{
     public Client() {
     }
 
-    public Client(java.lang.Long id, String name, String surname, String patronymic, Sex sex, Date birthday, LocalDateTime added, boolean active, String email, String phoneNumber, ClientCard clientCard, User aUser) {
+    public Client(java.lang.Long id, String name, String surname, String patronymic, Sex sex, Date birthday, LocalDateTime added, boolean active, String email, String phoneNumber, ClientCard clientCard, User user) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -101,7 +101,7 @@ public class Client implements Persistable<java.lang.Long>{
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.clientCard = clientCard;
-        this.aUser = aUser;
+        this.user = user;
     }
 
     public String getName() {
@@ -197,6 +197,6 @@ public class Client implements Persistable<java.lang.Long>{
     }
 
     public void setUser(User aUser) {
-        this.aUser = aUser;
+        this.user = aUser;
     }
 }

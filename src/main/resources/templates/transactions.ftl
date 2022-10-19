@@ -57,7 +57,7 @@
                         <th scope="col">${transaction.volume?string["0.00"]}</th>
                         <th scope="col">${transaction.total?string["0.00"]}</th>
                         <th scope="col">${transaction.bonus?string["0.00"]}</th>
-                        <th scope="col">${transaction.clientCard}</th>
+                        <th scope="col">${transaction.cardNumber}</th>
                         <th scope="col">${transaction.creator.username}</th>
                         <#if transaction.creator.id == id || isAdmin>
                             <th scope="col">

@@ -35,10 +35,10 @@ public class TerminalController {
     TransactionService transactionService;
 
 
-    @GetMapping("/{id}}")
-    public ResponseEntity<Integer> onLine(@PathVariable Long id){
+    @GetMapping("/{term_id}")
+    public ResponseEntity<Integer> onLine(@PathVariable Long term_id){
 
-        Optional<User> user = userService.findById(id);
+         Optional<User> user = userService.findById(term_id);
 
         return user.isPresent()? new ResponseEntity<>(0, HttpStatus.OK):
                 new ResponseEntity<>(-1, HttpStatus.NOT_FOUND);
@@ -51,12 +51,13 @@ public class TerminalController {
 
 
         return client != null ? new ResponseEntity<>(client, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/{term_id}/accumulate")
     public ResponseEntity<FuelTransaction> accumulate(@PathVariable Long term_id,
                                                       @RequestParam(required = false) Long id,
+                                                      @RequestParam Boolean nal,
                                                       @RequestParam @NotBlank String cardNumber,
                                                       @RequestParam @NotBlank String fuel,
                                                       @RequestParam @NotNull Float price,
@@ -66,6 +67,10 @@ public class TerminalController {
         if (creator.isPresent()) {
             FuelTransaction fuelTransaction =
                     transactionService.createOrUpdateTransaction(id, cardNumber, fuel, volume, price, creator.get());
+            if (id != null){
+                return fuelTransaction != null ? new ResponseEntity<>(fuelTransaction, HttpStatus.ACCEPTED)
+                        : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            } else
             return fuelTransaction != null ? new ResponseEntity<>(fuelTransaction, HttpStatus.CREATED)
                     : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -76,8 +81,9 @@ public class TerminalController {
     public ResponseEntity<TerminalTransaction> useBonus(@PathVariable Long term_id,
                                                         @RequestParam(required = false) Long id,
                                                         @RequestParam Float bonus,
+                                                        @RequestParam Boolean nal,
                                                         @RequestParam String fuel,
-                                                        @RequestParam String clientCard,
+                                                        @RequestParam String cardNumber,
                                                         @RequestParam Float price,
                                                         @RequestParam @Length(max = 4, min = 4) String pin) {
 
@@ -86,14 +92,17 @@ public class TerminalController {
 
         if (creator.isPresent()) {
 
-            boolean checkPin = transactionService.checkPin(clientCard, pin);
+            boolean checkPin = transactionService.checkPin(cardNumber, pin);
             if (!checkPin) {
                 return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), false), HttpStatus.BAD_REQUEST);
             }
 
-            FuelTransaction transaction = transactionService.useBonus(id, fuel, clientCard, bonus, price, creator.get());
+            FuelTransaction transaction = transactionService.useBonus(id, fuel, cardNumber, bonus, price, creator.get());
 
             if (transaction != null) {
+                if (id != null){
+                    return new ResponseEntity<>(new TerminalTransaction(transaction, true), HttpStatus.ACCEPTED);
+                }else
                 return new ResponseEntity<>(new TerminalTransaction(transaction, true), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), true), HttpStatus.BAD_REQUEST);

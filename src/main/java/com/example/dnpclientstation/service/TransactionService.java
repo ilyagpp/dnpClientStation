@@ -91,7 +91,7 @@ public class TransactionService {
             clientCard.setBonus(clientCard.getBonus() - transaction.getBonus());
 
             if (cardNumber != null) {
-                transaction.setClientCard(cardNumber);
+                transaction.setCardNumber(cardNumber);
             }
             if (fuel != null) {
                 transaction.setFuel(FuelUtil.convert(fuel));
@@ -114,7 +114,7 @@ public class TransactionService {
         } else {
             transaction = new FuelTransaction();
             transaction.setFuel(FuelUtil.convert(fuel));
-            transaction.setClientCard(cardNumber);
+            transaction.setCardNumber(cardNumber);
             transaction.setUpdateDateTime(LocalDateTime.now());
             transaction.setCreateDateTime(LocalDateTime.now());
             transaction.setPrice(price);
@@ -190,7 +190,7 @@ public class TransactionService {
                 FuelTransaction useBonusTransaction = new FuelTransaction();
                 useBonusTransaction.setCreator(creator);
                 useBonusTransaction.setBonus(bonus * -1);
-                useBonusTransaction.setClientCard(clientCard);
+                useBonusTransaction.setCardNumber(clientCard);
                 useBonusTransaction.setCreateDateTime(LocalDateTime.now());
                 useBonusTransaction.setUpdateDateTime(LocalDateTime.now());
                 useBonusTransaction.setPrice(price);
@@ -229,7 +229,7 @@ public class TransactionService {
             return false;
         }
 
-        ClientCard clientCard = cardService.findByCardNumber(transaction.getClientCard());
+        ClientCard clientCard = cardService.findByCardNumber(transaction.getCardNumber());
 
         float bonus = 0.0f;
 

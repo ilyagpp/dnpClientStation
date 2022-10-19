@@ -60,7 +60,7 @@
 
         <span class="form-inline my-2 my-lg-0">
             <div class="navbar-text mr-sm-2">${name}</div>
-            <#if aUser??> <@l.logout /> <#else>
+            <#if user??> <@l.logout /> <#else>
                 <a class="btn btn-success" href="/main" role="link">Авторизация</a></#if>
         </span>
 

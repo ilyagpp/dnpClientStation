@@ -180,7 +180,7 @@ public class TransactionController {
         FuelTransaction fuelTransaction = transactionService.findFuelTransactionById(Long.valueOf(id)).orElse(null);
         model.addAttribute("editTransaction", fuelTransaction);
         assert fuelTransaction != null;
-        ClientCard card = transactionService.getClientCardByCardNumber(fuelTransaction.getClientCard());
+        ClientCard card = transactionService.getClientCardByCardNumber(fuelTransaction.getCardNumber());
         model.addAttribute("bonus", (fuelTransaction.getBonus() - card.getBonus())* -1);
 
         List<Price> priceList = transactionService.getPriceListByCreatorId(creator.getId());

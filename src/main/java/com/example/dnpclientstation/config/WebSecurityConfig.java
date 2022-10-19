@@ -35,7 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/","/registration", "/activate/*", "/static/**", "/check").permitAll()
                     .anyRequest().authenticated()
                 .and()
-                .csrf().ignoringAntMatchers("/login", "/terminal/**")
+                .csrf().ignoringAntMatchers("/login", "/terminal/**", "/terminal/*")
                 .and()
                     .formLogin()
                     .loginPage("/login")
@@ -52,4 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userService)
                 .passwordEncoder(passwordEncoder);
     }
+
+
 }
+

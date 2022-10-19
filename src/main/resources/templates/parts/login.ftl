@@ -4,7 +4,7 @@
         <div class="form-group row mt-2">
             <label class="col-sm-2 col-form-label"> Имя пользователя:</label>
             <div class="col-sm-5">
-            <input type="text" name="username" value="<#if aUser??>${aUser.username}</#if>"
+            <input type="text" name="username" value="<#if user??>${user.username}</#if>"
                    class="form-control ${(usernameError??)?string('is-invalid', '')}"
                     placeholder="Имя пользователя"/>
                 <#if usernameError??>
@@ -42,7 +42,7 @@
             <div class="form-group row mt-2">
                 <label class="col-sm-2 col-form-label"> Электронная почта (Email):</label>
                 <div class="col-sm-5">
-                    <input type="email" name="email" value="<#if aUser??>${aUser.email!""}</#if>"
+                    <input type="email" name="email" value="<#if user??>${user.email!""}</#if>"
                            class="form-control ${(emailError??)?string('is-invalid', '')}"
                            placeholder="some@some.com"/>
                     <#if emailError??>
