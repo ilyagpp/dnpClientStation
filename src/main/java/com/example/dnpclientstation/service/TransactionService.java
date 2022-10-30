@@ -168,7 +168,7 @@ public class TransactionService {
 
         if (id != null) {
             FuelTransaction updateUseBonusTransaction = transactionsRepo.getOne(id);
-            card.setBonus(bonus +(updateUseBonusTransaction.getBonus()* -1));
+            card.setBonus(card.getBonus() +(updateUseBonusTransaction.getBonus()* -1));
             if (card.getBonus() >= bonus){
 
                 updateUseBonusTransaction.setBonus(bonus * -1);
@@ -262,10 +262,10 @@ public class TransactionService {
     }
 
 
-    public static Float convertIntToFloat(Integer integer, Integer divider){
+    public static Float convertIntToFloat(Integer integer, Integer decimal){
 
-        float newDivider = (float) Math.pow(10, divider);
+        float newDecimal = (float) Math.pow(10, decimal);
 
-        return (integer / newDivider);
+        return (integer / newDecimal);
     }
 }

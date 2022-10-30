@@ -68,10 +68,10 @@ public class TerminalController {
             FuelTransaction fuelTransaction =
                     transactionService.createOrUpdateTransaction(id, cardNumber, fuel, TransactionService.convertIntToFloat(volume,3), TransactionService.convertIntToFloat(price, 2), nal, creator.get());
             if (id != null){
-                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, true), HttpStatus.ACCEPTED)
+                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false), HttpStatus.ACCEPTED)
                         : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             } else
-            return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, true), HttpStatus.CREATED)
+            return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false), HttpStatus.CREATED)
                     : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }

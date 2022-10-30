@@ -51,9 +51,9 @@ public class TerminalTransaction extends FuelTransaction {
     public TerminalTransaction(Long id, String fuel, float price, float volume, float total, boolean nal, User creator, Boolean pinStatus) {
         super(id, fuel, price, volume, total, nal, creator);
 
-        this.volumeT = (int)volume * 1000;
-        this.totalT = (int) total * 100;
-        this.priceT = (int) price * 100;
+        this.volumeT = (int)(volume * 1000);
+        this.totalT = (int) (total * 100);
+        this.priceT = (int) (price * 100);
         this.pinStatus = pinStatus;
     }
 
@@ -63,9 +63,9 @@ public class TerminalTransaction extends FuelTransaction {
                 fuelTransaction.getVolume(), fuelTransaction.getTotal(), fuelTransaction.getCardNumber(),
                 fuelTransaction.getBonus(), fuelTransaction.isNal(), fuelTransaction.getCreator());
 
-        this.volumeT = (int)fuelTransaction.getVolume() * 1000;
-        this.totalT = (int)fuelTransaction.getTotal() * 100;
-        this.priceT = (int)fuelTransaction.getPrice() * 100;
+        this.volumeT = (int) (fuelTransaction.getVolume() * 1000);
+        this.totalT = (int) (fuelTransaction.getTotal() * 100);
+        this.priceT = (int) (fuelTransaction.getPrice() * 100);
 
         this.pinStatus = pinStatus;
     }
