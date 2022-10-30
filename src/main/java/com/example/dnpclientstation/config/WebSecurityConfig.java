@@ -23,6 +23,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AppBasicAuthenticationEntryPoint authenticationEntryPoint;
+
     @Bean
     public PasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder(8);
@@ -41,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .loginPage("/login")
                     .permitAll()
                 .and()
-                    .rememberMe()
+                    .rememberMe().tokenValiditySeconds(86400)
                 .and()
                     .logout()
                     .permitAll();

@@ -55,23 +55,23 @@ public class TerminalController {
     }
 
     @PostMapping("/{term_id}/accumulate")
-    public ResponseEntity<FuelTransaction> accumulate(@PathVariable Long term_id,
+    public ResponseEntity<TerminalTransaction> accumulate(@PathVariable Long term_id,
                                                       @RequestParam(required = false) Long id,
                                                       @RequestParam Boolean nal,
                                                       @RequestParam @NotBlank String cardNumber,
                                                       @RequestParam @NotBlank String fuel,
-                                                      @RequestParam @NotNull Float price,
-                                                      @RequestParam @NotNull Float volume) {
+                                                      @RequestParam @NotNull Integer price,
+                                                      @RequestParam @NotNull Integer volume) {
 
         Optional<User> creator = userService.findById(term_id);
         if (creator.isPresent()) {
             FuelTransaction fuelTransaction =
-                    transactionService.createOrUpdateTransaction(id, cardNumber, fuel, volume, price, creator.get());
+                    transactionService.createOrUpdateTransaction(id, cardNumber, fuel, TransactionService.convertIntToFloat(volume,3), TransactionService.convertIntToFloat(price, 2), nal, creator.get());
             if (id != null){
-                return fuelTransaction != null ? new ResponseEntity<>(fuelTransaction, HttpStatus.ACCEPTED)
+                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, true), HttpStatus.ACCEPTED)
                         : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             } else
-            return fuelTransaction != null ? new ResponseEntity<>(fuelTransaction, HttpStatus.CREATED)
+            return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, true), HttpStatus.CREATED)
                     : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
@@ -84,7 +84,7 @@ public class TerminalController {
                                                         @RequestParam Boolean nal,
                                                         @RequestParam String fuel,
                                                         @RequestParam String cardNumber,
-                                                        @RequestParam Float price,
+                                                        @RequestParam Integer price,
                                                         @RequestParam @Length(max = 4, min = 4) String pin) {
 
 
@@ -97,7 +97,7 @@ public class TerminalController {
                 return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), false), HttpStatus.BAD_REQUEST);
             }
 
-            FuelTransaction transaction = transactionService.useBonus(id, fuel, cardNumber, bonus, price, creator.get());
+            FuelTransaction transaction = transactionService.useBonus(id, fuel, cardNumber, bonus, TransactionService.convertIntToFloat(price,2), nal, creator.get());
 
             if (transaction != null) {
                 if (id != null){

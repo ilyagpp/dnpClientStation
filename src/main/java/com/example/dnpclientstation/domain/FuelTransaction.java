@@ -47,6 +47,10 @@ public class FuelTransaction implements Persistable<Long> {
             "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
     private User creator;
 
+
+    private Boolean nal;
+
+
     public String getCardNumber() {
         return cardNumber;
     }
@@ -55,7 +59,7 @@ public class FuelTransaction implements Persistable<Long> {
     public FuelTransaction() {
     }
 
-    public FuelTransaction(Long id, String fuel, float price, float volume, float total, User creator) {
+    public FuelTransaction(Long id, String fuel, float price, float volume, float total, boolean nal, User creator) {
         this.id = id;
         this.createDateTime = LocalDateTime.now();
         this.updateDateTime = LocalDateTime.now();
@@ -63,10 +67,11 @@ public class FuelTransaction implements Persistable<Long> {
         this.price = price;
         this.volume = volume;
         this.total = total;
+        this.nal = nal;
         this.creator = creator;
     }
 
-    public FuelTransaction(Long id, LocalDateTime createDateTime, LocalDateTime updateDateTime, String fuel, float price, float volume, float total, String cardNumber, Float bonus, User creator) {
+    public FuelTransaction(Long id, LocalDateTime createDateTime, LocalDateTime updateDateTime, String fuel, float price, float volume, float total, String cardNumber, Float bonus, boolean nal, User creator) {
         this.id = id;
         this.createDateTime = createDateTime;
         this.updateDateTime = updateDateTime;
@@ -76,6 +81,7 @@ public class FuelTransaction implements Persistable<Long> {
         this.total = total;
         this.cardNumber = cardNumber;
         this.bonus = bonus;
+        this.nal = nal;
         this.creator = creator;
     }
 
@@ -151,6 +157,18 @@ public class FuelTransaction implements Persistable<Long> {
         this.creator = creator;
     }
 
+
+    public Boolean isNal() {
+        if (nal == null){
+            return false;
+        }
+        return nal;
+    }
+
+    public void setNal(boolean nal) {
+        this.nal = nal;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -161,37 +179,5 @@ public class FuelTransaction implements Persistable<Long> {
         return id == null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FuelTransaction)) return false;
 
-        FuelTransaction that = (FuelTransaction) o;
-
-        if (Float.compare(that.getPrice(), getPrice()) != 0) return false;
-        if (Float.compare(that.getVolume(), getVolume()) != 0) return false;
-        if (Float.compare(that.getTotal(), getTotal()) != 0) return false;
-        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
-        if (!getCreateDateTime().equals(that.getCreateDateTime())) return false;
-        if (!getUpdateDateTime().equals(that.getUpdateDateTime())) return false;
-        if (!getFuel().equals(that.getFuel())) return false;
-        if (!getCardNumber().equals(that.getCardNumber())) return false;
-        if (!getBonus().equals(that.getBonus())) return false;
-        return getCreator().equals(that.getCreator());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + getCreateDateTime().hashCode();
-        result = 31 * result + getUpdateDateTime().hashCode();
-        result = 31 * result + getFuel().hashCode();
-        result = 31 * result + (getPrice() != +0.0f ? Float.floatToIntBits(getPrice()) : 0);
-        result = 31 * result + (getVolume() != +0.0f ? Float.floatToIntBits(getVolume()) : 0);
-        result = 31 * result + (getTotal() != +0.0f ? Float.floatToIntBits(getTotal()) : 0);
-        result = 31 * result + getCardNumber().hashCode();
-        result = 31 * result + getBonus().hashCode();
-        result = 31 * result + getCreator().hashCode();
-        return result;
-    }
 }

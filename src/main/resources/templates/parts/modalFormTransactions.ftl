@@ -18,6 +18,21 @@
                                readonly>
                         </#if>
                     </div>
+                    <div id="nal" class="form-group">
+                        <label for="nal">Тип оплаты</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="nal" id="nal" value="true" checked>
+                            <label class="form-check-label" for="nal">
+                                Наличными
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="nal" id="nal" value="false">
+                            <label class="form-check-label" for="nal">
+                                Безналичными
+                            </label>
+                        </div>
+                    </div>
 
                     <div class="form-group">
                         <label for="fuel">Вид ГСМ</label>
@@ -96,7 +111,21 @@
                                        readonly>
                             </#if>
                         </div>
-
+                        <div id="nal" class="form-group">
+                            <label for="nal">Тип оплаты</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="true" checked>
+                                <label class="form-check-label" for="nal">
+                                    Наличными
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="false">
+                                <label class="form-check-label" for="nal">
+                                    Безналичными
+                                </label>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="fuel">Вид ГСМ</label>
                             <select id="fuel" class="form-control" name="fuel">

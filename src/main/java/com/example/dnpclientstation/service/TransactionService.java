@@ -73,7 +73,7 @@ public class TransactionService {
 
 
     @Transactional(readOnly = false)
-    public FuelTransaction createOrUpdateTransaction(Long id, String cardNumber, String fuel, Float volume, Float price, User creator) {
+    public FuelTransaction createOrUpdateTransaction(Long id, String cardNumber, String fuel, Float volume, Float price, Boolean nal, User creator) {
 
         ClientCard clientCard = cardService.findByCardNumber(cardNumber);
 
@@ -111,6 +111,8 @@ public class TransactionService {
 
             transaction.setCreator(creator);
 
+            transaction.setNal(nal);
+
         } else {
             transaction = new FuelTransaction();
             transaction.setFuel(FuelUtil.convert(fuel));
@@ -122,6 +124,7 @@ public class TransactionService {
             transaction.setTotal(getTotal(volume, price));
             transaction.setBonus(getTotal(volume, price) * getBonusPercent());
             transaction.setCreator(creator);
+            transaction.setNal(nal);
         }
         clientCard.setBonus(clientCard.getBonus() + transaction.getBonus());
         cardService.save(clientCard);
@@ -158,7 +161,7 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = false)
-    public FuelTransaction useBonus(Long id, String fuel, String clientCard, Float bonus, Float price, User creator) {
+    public FuelTransaction useBonus(Long id, String fuel, String clientCard, Float bonus, Float price, Boolean nal, User creator) {
 
 
         ClientCard card = cardService.findByCardNumber(clientCard);
@@ -174,7 +177,7 @@ public class TransactionService {
                 updateUseBonusTransaction.setUpdateDateTime(LocalDateTime.now());
                 updateUseBonusTransaction.setVolume(getVolume(bonus, price));
                 updateUseBonusTransaction.setTotal(bonus);
-
+                updateUseBonusTransaction.setNal(nal);
                 card.setBonus(card.getBonus() - bonus);
 
                 cardService.save(card);
@@ -197,6 +200,7 @@ public class TransactionService {
                 useBonusTransaction.setVolume(getVolume(bonus, price));
                 useBonusTransaction.setTotal(bonus);
                 useBonusTransaction.setFuel(FuelUtil.convert(fuel));
+                useBonusTransaction.setNal(nal);
 
                 card.setBonus(card.getBonus() - bonus);
 
@@ -255,5 +259,13 @@ public class TransactionService {
             return false;
         }
         return client.getPin().equals(pin);
+    }
+
+
+    public static Float convertIntToFloat(Integer integer, Integer divider){
+
+        float newDivider = (float) Math.pow(10, divider);
+
+        return (integer / newDivider);
     }
 }

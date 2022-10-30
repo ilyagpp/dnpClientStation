@@ -53,9 +53,9 @@
                     <a class="nav-link" aria-current="page" href="/user/profile">Профиль</a>
                 </li>
             </#if>
-            <li class="nav-item">
+           <#-- <li class="nav-item">
                 <a class="nav-link" aria-current="page" href="/main">Обратная связь</a>
-            </li>
+            </li>-->
         </ul>
 
         <span class="form-inline my-2 my-lg-0">

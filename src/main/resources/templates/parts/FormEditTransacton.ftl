@@ -16,7 +16,7 @@
                         <label for="clientCard" class="col-sm-2 col-form-label">Карта клиента</label>
                         <div class="col-sm-10">
                             <input class="form-control" type="text"
-                                   placeholder="${editTransaction.getClientCard()}" readonly>
+                                   placeholder="${editTransaction.getCardNumber()}" readonly>
                         </div>
                         <label for="fuel" class="col-sm-2 col-form-label">Топливо</label>
                         <div class="col-sm-10">

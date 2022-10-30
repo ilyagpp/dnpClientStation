@@ -88,6 +88,7 @@ public class TransactionController {
                                   @RequestParam(required = false) Long id,
                                   @RequestParam @Length(max = 13, message = "Номер кары введен неверно, длинна не соответствует") String clientCard,
                                   @RequestParam @NotBlank String fuel,
+                                  @RequestParam boolean nal,
                                   @RequestParam String exampleRadios,
                                   @RequestParam(required = false) String input
 
@@ -119,7 +120,7 @@ public class TransactionController {
                     volume = Float.parseFloat(input);
             }
 
-            transactionService.createOrUpdateTransaction(id, clientCard, fuelA, volume, price, creator);
+            transactionService.createOrUpdateTransaction(id, clientCard, fuelA, volume, price, nal, creator);
 
         } else model.addAttribute("error", "Вы забыли ввести объем");
         return "redirect:/transactions";
@@ -133,6 +134,7 @@ public class TransactionController {
                            @RequestParam String clientCard,
                            @RequestParam (required = false) String pin,
                            @RequestParam String bonus,
+                           @RequestParam Boolean nal,
                            @RequestHeader(required = false) String referer) {
 
         boolean checkPin;
@@ -151,7 +153,7 @@ public class TransactionController {
                 String fuelA = ControllerUtils.checkByСomma(input[0]);
                 Float price = Float.valueOf(ControllerUtils.checkByСomma(input[1]));
 
-                FuelTransaction transaction = transactionService.useBonus(id, fuelA, clientCard, Float.valueOf(bonus), price, creator);
+                FuelTransaction transaction = transactionService.useBonus(id, fuelA, clientCard, Float.valueOf(bonus), price, nal, creator);
 
                 if (transaction != null) {
                     model.addAttribute("transactionComplete", "Успешно!");

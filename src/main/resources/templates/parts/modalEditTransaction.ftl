@@ -14,9 +14,24 @@
                         <div class="form-group">
                             <label for="clientCard" class="col-form-label">Номер карты</label>
                             <#if editTransaction??>
-                                <input class="form-control" type="text" name="clientCard" value="${editTransaction.getClientCard()}" placeholder="${editTransaction.getClientCard()} "
+                                <input class="form-control" type="text" name="clientCard" value="${editTransaction.getCardNumber()}" placeholder="${editTransaction.getCardNumber()} "
                                        readonly>
                             </#if>
+                        </div>
+                        <div id="nal" class="form-group">
+                            <label for="nal">Тип оплаты</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="true" checked>
+                                <label class="form-check-label" for="nal">
+                                    Наличными
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="false">
+                                <label class="form-check-label" for="nal">
+                                    Безналичными
+                                </label>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="fuel">Вид ГСМ</label>
@@ -82,7 +97,7 @@
                         <div class="form-group">
                             <label for="clientCard" class="col-form-label">Номер карты</label>
                             <#if editTransaction??>
-                                <input class="form-control" type="text" name="clientCard" value="${editTransaction.getClientCard()}" placeholder="${editTransaction.getClientCard()} "
+                                <input class="form-control" type="text" name="clientCard" value="${editTransaction.getCardNumber()}" placeholder="${editTransaction.getCardNumber()} "
                                        readonly>
                             <#else ><input type="text" class="form-control" name="clientCard" oninput="changeHandler(this)" >
                             </#if>
@@ -93,7 +108,21 @@
                                 <input class="form-control" type="text" name="cardBonus" placeholder="<#if bonus??> ${bonus}<#else>0</#if>"
                                        readonly>
                         </div>
-
+                        <div id="nal" class="form-group">
+                            <label for="nal">Тип оплаты</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="true" checked>
+                                <label class="form-check-label" for="nal">
+                                    Наличными
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="false">
+                                <label class="form-check-label" for="nal">
+                                    Безналичными
+                                </label>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="fuel">Вид ГСМ</label>
                             <select id="fuel" class="form-control" name="fuel">

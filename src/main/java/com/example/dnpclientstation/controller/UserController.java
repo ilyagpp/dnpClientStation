@@ -39,7 +39,7 @@ public class UserController {
     public String userSave(
             @RequestParam String username,
             @RequestParam Map<String,String> form,
-            @RequestParam("user") User user){
+            @RequestParam("userId") User user){
 
        userService.saveUser(user, username, form);
         return "redirect:/user";

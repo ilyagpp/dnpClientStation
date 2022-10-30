@@ -36,10 +36,11 @@ public class MainController {
 
 
     @GetMapping("/")
-    public String greeting(Model model){
+    public String start(Model model){
         return "start";
     }
 
+/*
     @GetMapping("/main")
     public String main(@RequestParam(required = false, defaultValue = "") String filter, Model model){
         Iterable<Message> messages;
@@ -77,6 +78,7 @@ public class MainController {
 
         return "main";
     }
+*/
 
 
     @GetMapping ("/main-operator")
