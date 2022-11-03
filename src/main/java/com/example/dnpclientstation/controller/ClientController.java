@@ -251,9 +251,11 @@ public class ClientController {
                 model.addAttribute("client", client);
                 return false;
             }
+
             if (client.getPin().isEmpty()){
                 client.setPin(clientService.pinGenerator());
             }
+
             client.setAdded(LocalDateTime.now());
             String message = mailService.sendClientRegistrationMessage(client);
             if (message.contains("Fail")){

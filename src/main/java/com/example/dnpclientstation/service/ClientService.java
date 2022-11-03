@@ -63,12 +63,15 @@ public class ClientService {
 
 
     public void save(Client client) {
+        try {
+            Client saveClient = clientRepo.save(client);
+            if (client.getId()==null){
+                log.info("Добавлен новый клиент: "+saveClient.toString());
+            } else log.info("Обновление данных клиента:" +saveClient.toString());
 
-        Client saveClient = clientRepo.save(client);
-
-        if (client.getId()==null){
-            log.info("Добавлен новый клиент: "+saveClient.toString());
-        } else log.info("Обновление данных клиента:" +saveClient.toString());
+        }catch (Exception e){
+            log.info(e.getMessage());
+        }
 
     }
 
@@ -124,7 +127,6 @@ public class ClientService {
         if (pin.length() == 4 && client != null && !client.getPin().equals("NO")) {
             client.setPin(pin);
             clientRepo.save(client);
-
             log.info("Клиенту :" + client +" установлен новый пин");
             return true;
         } else return false;

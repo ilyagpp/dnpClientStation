@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "clients")
 
+
 public class Client implements Persistable<java.lang.Long>{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_generator")
@@ -43,9 +44,11 @@ public class Client implements Persistable<java.lang.Long>{
 
     @Email(message = "поле должно соответствовать типу: \"aUser@usermail.com\"")
     @NotBlank(message = "Поле не может быть пустым")
+    @Column(unique=true)
     private String email;
 
     @Length(min = 10, max = 10, message = "Длинна строго 10 цифр")
+    @Column(unique=true)
     private String phoneNumber;
 
     @ManyToOne
