@@ -103,7 +103,7 @@ public class TerminalController {
                 if (id != null){
                     return new ResponseEntity<>(new TerminalTransaction(transaction, true), HttpStatus.ACCEPTED);
                 }else
-                return new ResponseEntity<>(new TerminalTransaction(transaction, true), HttpStatus.OK);
+                return new ResponseEntity<>(new TerminalTransaction(transaction, true), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), true), HttpStatus.BAD_REQUEST);
             }

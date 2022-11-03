@@ -1,8 +1,14 @@
 package com.example.dnpclientstation.domain;
 
+import com.example.dnpclientstation.service.TransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Locale;
 
 public class FuelUtil {
+    static final Logger log =
+            LoggerFactory.getLogger(FuelUtil.class);
 
     public static String convert(String fuel){
 

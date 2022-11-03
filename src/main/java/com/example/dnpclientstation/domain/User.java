@@ -126,4 +126,11 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
+    @Override
+    public String toString() {
+        return "Creator{" +
+                "id= " + id +
+                ", username= '" + username + '\'' +
+                '}';
+    }
 }

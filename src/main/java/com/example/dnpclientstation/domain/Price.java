@@ -11,7 +11,7 @@ public class Price {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "price_generator")
     @SequenceGenerator(name="price_generator", sequenceName = "price_sequence", allocationSize = 1, initialValue = 1)
     @Column(name = "id", nullable = false)
-    private java.lang.Long id;
+    private Long id;
 
     @Column(name = "fuel")
     private String fuel;

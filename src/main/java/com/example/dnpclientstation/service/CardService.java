@@ -3,6 +3,8 @@ package com.example.dnpclientstation.service;
 import com.example.dnpclientstation.domain.ClientCard;
 import com.example.dnpclientstation.repositories.CardRepo;
 import com.example.dnpclientstation.repositories.UserRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,9 @@ import java.util.stream.Collectors;
 @Service
 public class CardService {
 
+    static final Logger log =
+            LoggerFactory.getLogger(CardService.class);
+
     @Autowired
     private CardRepo cardRepo;
 
@@ -24,20 +29,22 @@ public class CardService {
     public boolean save(ClientCard clientCard){
         if (clientCard != null) {
             cardRepo.save(clientCard);
+
+            log.info("Обновляем данные карты: "+ clientCard.toString());
             return true;
         }
         return false;
     }
 
 
-    public boolean addNewCard(String cardNumber){
+    public void addNewCard(String cardNumber){
 
         if (cardRepo.findByCardNumber(cardNumber) != null){
-            return false;
+            return;
         }
 
-        cardRepo.save(new ClientCard(cardNumber, (float) 0, null));
-        return true;
+        ClientCard clientCard = cardRepo.save(new ClientCard(cardNumber, (float) 0, null));
+        log.info("Добавлена новая карта: "+ clientCard);
     }
 
     public String  getLastCardNumber() {
@@ -70,15 +77,12 @@ public class CardService {
         return cardRepo.findByCardNumber(cardNumber);
     }
 
-    public boolean automaitcCreateNewCard(){
-        try {
-            Long number = Long.valueOf(getLastCardNumber()) +1;
+    public void automaitcCreateNewCard(){
+
+            Long number = Long.parseLong(getLastCardNumber()) +1;
             String newNumber = String.valueOf(number);
             addNewCard(newNumber);
-        }catch (Exception e){
-         return false;
-        }
-        return true;
+
     }
 
 }

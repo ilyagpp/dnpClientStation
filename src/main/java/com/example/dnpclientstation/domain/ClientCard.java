@@ -67,4 +67,22 @@ public class ClientCard {
     public void setClient(Client client) {
         this.client = client;
     }
+
+    @Override
+    public String toString() {
+        return client != null?
+                "ClientCard{" +
+                "id=" + id +
+                ", cardNumber='" + cardNumber + '\'' +
+                ", bonus=" + bonus +
+                ", client=" + client.getId() +
+                '}'
+                :
+                "ClientCard{" +
+                        "id=" + id +
+                        ", cardNumber='" + cardNumber + '\'' +
+                        ", bonus=" + bonus +
+                        ", client=" + null +
+                        '}';
+    }
 }

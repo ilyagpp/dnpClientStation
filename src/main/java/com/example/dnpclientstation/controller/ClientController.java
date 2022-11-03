@@ -263,12 +263,14 @@ public class ClientController {
             }
 
         } else {
-            Client clientFromBD = clientService.findById(client.getId()).get();
+            Client clientFromBD = clientService.findById(client.getId()).orElse(null);
             if (client.getBirthday() == null) {
-                    if (clientFromBD.getBirthday() != null) {
+                assert clientFromBD != null;
+                if (clientFromBD.getBirthday() != null) {
                         client.setBirthday(clientFromBD.getBirthday());
                     }
             }
+            assert clientFromBD != null;
             client.setClientCard(clientFromBD.getClientCard());
             client.setAdded(clientFromBD.getAdded());
             client.setPin(clientFromBD.getPin());

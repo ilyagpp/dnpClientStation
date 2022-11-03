@@ -179,5 +179,20 @@ public class FuelTransaction implements Persistable<Long> {
         return id == null;
     }
 
-
+    @Override
+    public String toString() {
+        return "FuelTransaction{" +
+                "id=" + id +
+                ", createDateTime=" + createDateTime.toLocalDate() + " " + createDateTime.toLocalTime()+
+                ", updateDateTime=" + updateDateTime.toLocalDate() + " " + updateDateTime.toLocalTime()+
+                ", fuel='" + fuel + '\'' +
+                ", price=" + price +
+                ", volume=" + volume +
+                ", total=" + total +
+                ", cardNumber='" + cardNumber + '\'' +
+                ", bonus=" + bonus +
+                ", "+creator.toString() +
+                ", nal=" + nal +
+                '}';
+    }
 }

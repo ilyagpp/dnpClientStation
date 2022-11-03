@@ -199,4 +199,36 @@ public class Client implements Persistable<java.lang.Long>{
     public void setUser(User aUser) {
         this.user = aUser;
     }
+
+    @Override
+    public String toString() {
+        if (user == null);
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Client{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", patronymic='" + patronymic + '\'' +
+                ", sex=" + sex +
+                ", birthday=" + birthday +
+                ", added=" + added +
+                ", active=" + active +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' );
+
+        if (clientCard != null){
+            sb.append(", clientCard=" + clientCard.getCardNumber());
+        } else sb.append(", clientCard=null");
+
+        if (user!= null) {
+            sb.append(", user=" + user.getId());
+        }else sb.append(", user=null");
+
+        sb.append(", pin='" + pin + '\'' +
+                '}');
+
+        return sb.toString();
+    }
 }

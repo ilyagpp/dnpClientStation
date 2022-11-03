@@ -3,18 +3,22 @@ package com.example.dnpclientstation.service;
 import com.example.dnpclientstation.domain.Client;
 import com.example.dnpclientstation.domain.ClientCard;
 import com.example.dnpclientstation.repositories.ClientRepo;
-import org.hibernate.id.UUIDGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class ClientService {
+
+    static final Logger log =
+            LoggerFactory.getLogger(ClientService.class);
 
     @Autowired
     ClientRepo clientRepo;
@@ -42,6 +46,7 @@ public class ClientService {
         return clientCard != null ? clientRepo.findByClientCard(clientCard) : null;
 
     }
+
     public Client searchClientByCardNameEmailPhone(String search) {
 
         Client client = search(search);
@@ -58,11 +63,16 @@ public class ClientService {
 
 
     public void save(Client client) {
-        clientRepo.save(client);
+
+        Client saveClient = clientRepo.save(client);
+
+        if (client.getId()==null){
+            log.info("Добавлен новый клиент: "+saveClient.toString());
+        } else log.info("Обновление данных клиента:" +saveClient.toString());
+
     }
 
     public Client search(String search) {
-
         Client client = null;
 
         client = clientRepo.findByPhoneNumber(search);
@@ -78,6 +88,7 @@ public class ClientService {
     }
 
     public boolean checkPhoneNumber(String phoneNumber) {
+
         return clientRepo.findByPhoneNumber(phoneNumber) == null;
     }
 
@@ -94,38 +105,39 @@ public class ClientService {
             } else {
 
                 clientRepo.deleteById(id);
+
+                log.info("Удаляется клиент: "+ client);
                 return true;
 
             }
         }
-
         return false;
-
 
     }
 
     public Page<Client> findAll(Pageable pageable) {
-        return   clientRepo.findAll(pageable);
+        return clientRepo.findAll(pageable);
     }
 
-    public boolean setNewPin(String pin, Client client){
+    public boolean setNewPin(String pin, Client client) {
 
-        if (pin.length() == 4 && client != null && !client.getPin().equals("NO") ) {
+        if (pin.length() == 4 && client != null && !client.getPin().equals("NO")) {
             client.setPin(pin);
             clientRepo.save(client);
+
+            log.info("Клиенту :" + client +" установлен новый пин");
             return true;
         } else return false;
     }
 
 
-
-    public String getPinCode(Long id){
+    public String getPinCode(Long id) {
         assert id != null;
         Client bdClient = clientRepo.findById(id).orElse(new Client());
         return bdClient.getPin();
     }
 
-    public String pinGenerator(){
+    public String pinGenerator() {
         Random random = new Random();
         return String.format("%04d", random.nextInt(10000));
     }
@@ -133,12 +145,13 @@ public class ClientService {
     public boolean changePin(String pin, Long id) {
 
         Optional<Client> client = clientRepo.findById(id);
-        if (client.isPresent()){
+
+        if (client.isPresent()) {
 
             client.get().setPin(pin);
             clientRepo.save(client.get());
+            log.info("Запрос на смену pin, для клиента: "+ client);
             return true;
-        } else  return  false;
-
+        } else return false;
     }
 }
