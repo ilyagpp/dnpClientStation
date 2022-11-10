@@ -49,7 +49,7 @@
                             ${transaction.createDateTime.toLocalTime().hour?string["00"]}:
                             ${transaction.createDateTime.toLocalTime().minute?string["00"]}:
                             ${transaction.createDateTime.toLocalTime().second?string["00"]} &nbsp
-                            ${transaction.createDateTime.toLocalDate()}</th>
+                            ${transaction.createDateTime.toLocalDate()?string?date['yyyy-MM-dd']}</th>
                         <th scope="col">
                             <@fuel.fuelnames fuel= transaction.fuel></@fuel.fuelnames>
                         </th>
