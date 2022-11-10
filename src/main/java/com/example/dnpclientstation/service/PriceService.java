@@ -63,7 +63,7 @@ public class PriceService {
         return priceList;
     }
 
-    public boolean setUpPriceList(User[] id, String[] fuel, String[] price, User creator) {
+    public boolean setUpPriceList(Long[] id, String[] fuel, String[] price, User creator) {
         try {
             for (int i = 0; i<fuel.length; i++){
                 if (price[i] != null && !price[i].equals("")){

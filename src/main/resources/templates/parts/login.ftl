@@ -26,6 +26,19 @@
                 </#if>
             </div>
         </div>
+
+
+
+        <#if !isRegisterForm>
+            <div class="form-group row">
+                <div class="col-sm-2">Запомнить меня:</div>
+                <div class="col-sm-10">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
+                    </div>
+                </div>
+            </div>
+        </#if>
         <#if isRegisterForm>
             <div class="form-group row mt-2">
                 <label class="col-sm-2 col-form-label"> Повторите пароль:</label>

@@ -101,7 +101,7 @@ public class MainController {
                 model.addAttribute("clientError", String.format("по запросу %s данные в системе отсутствуют", search));
             }
         }
-
+        model.addAttribute("lastTransactionsList", transactionService.findByCreatorIdLimited(creator.getId(), 3));
 
         return "/operatorMain";
     }
@@ -112,7 +112,7 @@ public class MainController {
     public String setUp(@AuthenticationPrincipal User creator,
                         @RequestParam String[] price,
                         @RequestParam String[] fuel,
-                        @RequestParam User[] id,
+                        @RequestParam Long[] id,
                         Model model){
 
         ControllerUtils.checkByComa(price);

@@ -39,7 +39,7 @@
                                 <#if client.patronymic??>${client.patronymic!}</#if>
                             </th>
                             <th scope="col">
-                                ${client.birthday!""}</th>
+                                <#if client.birthday??>${client.birthday.toString()?date['yyyy-MM-dd']}</#if></th>
                             <th scope="col"><#if client.phoneNumber??>${client.phoneNumber}</#if></th>
                             <th scope="col"><#if client.email??> ${client.email}</#if></th>
                             <th scope="col"><#if client.clientCard??>${client.clientCard.cardNumber}</#if></th>

@@ -3,21 +3,23 @@ package com.example.dnpclientstation.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.Persistable;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "clients")
 
 
-public class Client implements Persistable<java.lang.Long>{
+public class Client implements Persistable<java.lang.Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_generator")
-    @SequenceGenerator(name="client_generator", sequenceName = "client_sequence", allocationSize = 1, initialValue = 1)
+    @SequenceGenerator(name = "client_generator", sequenceName = "client_sequence", allocationSize = 1, initialValue = 1)
     private java.lang.Long id;
 
 
@@ -33,22 +35,29 @@ public class Client implements Persistable<java.lang.Long>{
     @Enumerated(EnumType.STRING)
     private Sex sex;
 
+    public LocalDate getBirthday() {
+        return birthday;
+    }
 
-    private Date birthday;
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;
 
     private LocalDateTime added;
 
     private boolean active;
 
 
-
     @Email(message = "поле должно соответствовать типу: \"aUser@usermail.com\"")
     @NotBlank(message = "Поле не может быть пустым")
-    @Column(unique=true)
+    @Column(unique = true)
     private String email;
 
     @Length(min = 10, max = 10, message = "Длинна строго 10 цифр")
-    @Column(unique=true)
+    @Column(unique = true)
     private String phoneNumber;
 
     @ManyToOne
@@ -64,7 +73,6 @@ public class Client implements Persistable<java.lang.Long>{
     private String pin;
 
 
-
     public User getUser() {
         return user;
     }
@@ -75,11 +83,11 @@ public class Client implements Persistable<java.lang.Long>{
 
 
     @Override
-    public java.lang.Long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(java.lang.Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -92,7 +100,7 @@ public class Client implements Persistable<java.lang.Long>{
     public Client() {
     }
 
-    public Client(java.lang.Long id, String name, String surname, String patronymic, Sex sex, Date birthday, LocalDateTime added, boolean active, String email, String phoneNumber, ClientCard clientCard, User user) {
+    public Client(java.lang.Long id, String name, String surname, String patronymic, Sex sex, LocalDate birthday, LocalDateTime added, boolean active, String email, String phoneNumber, ClientCard clientCard, User user) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -135,7 +143,7 @@ public class Client implements Persistable<java.lang.Long>{
         String getSex;
         try {
             getSex = sex.getSex();
-        }catch (Exception e){
+        } catch (Exception e) {
             getSex = "unknown";
         }
 
@@ -144,7 +152,7 @@ public class Client implements Persistable<java.lang.Long>{
 
     public String getPin() {
 
-        return pin != null? pin: "NO";
+        return pin != null ? pin : "NO";
     }
 
     public void setPin(String pin) {
@@ -155,13 +163,6 @@ public class Client implements Persistable<java.lang.Long>{
         this.sex = sex;
     }
 
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
 
     public LocalDateTime getAdded() {
         return added;
@@ -205,7 +206,7 @@ public class Client implements Persistable<java.lang.Long>{
 
     @Override
     public String toString() {
-        if (user == null);
+        if (user == null) ;
 
         StringBuilder sb = new StringBuilder();
 
@@ -219,15 +220,15 @@ public class Client implements Persistable<java.lang.Long>{
                 ", added=" + added +
                 ", active=" + active +
                 ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' );
+                ", phoneNumber='" + phoneNumber + '\'');
 
-        if (clientCard != null){
+        if (clientCard != null) {
             sb.append(", clientCard=" + clientCard.getCardNumber());
         } else sb.append(", clientCard=null");
 
-        if (user!= null) {
+        if (user != null) {
             sb.append(", user=" + user.getId());
-        }else sb.append(", user=null");
+        } else sb.append(", user=null");
 
         sb.append(", pin='" + pin + '\'' +
                 '}');

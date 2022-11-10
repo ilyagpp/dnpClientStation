@@ -2,6 +2,7 @@
 <#import "parts/fuel.ftl" as fuel>
 <#import "parts/TransansactionClientInfo.ftl" as transclntinfo>
 <#import "parts/modalFormTransactions.ftl" as modaltransaction>
+<#import "parts/lastTransactionsList.ftl" as lastTransactions>
 <@c.page>
 
     <div class="container">
@@ -19,6 +20,11 @@
                         ${error}
                     </div>
                 </#if>
+                <div class="mt-3">
+                    <small>
+                <@lastTransactions.lastTransactionsList lastTransactionsList></@lastTransactions.lastTransactionsList>
+                    </small>
+                </div>
             </div>
             <div class="col-2">
                 <div class="card text-center bg-light" style="width: 8rem;">

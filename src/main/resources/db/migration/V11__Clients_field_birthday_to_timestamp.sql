@@ -1,0 +1,1 @@
+ALTER TABLE clients ALTER COLUMN birthday TYPE timestamp

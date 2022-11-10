@@ -57,9 +57,7 @@
     <div class="form-group">
         <label for="birthday">Дата рождения</label>
         <input type="date" name="birthday" class="col-sm-5 form-control" id="birthday"
-               datatype="date"
-               value="<#if edit??> <#if client.getBirthday()??>${client.getBirthday()}</#if> <#else> </#if>">
-
+               value="<#if edit?? && client.getBirthday()??>${client.birthday}</#if>">
     </div>
     <div class="form-group">
         <label for="phoneNumber">Телефон</label>
@@ -114,5 +112,7 @@
       </#if>
 </#if>
     <input type="hidden" name="_csrf" value="${_csrf.token}">
-    <button type="submit" class="btn btn-primary mt-3"><#if edit??>Применить<#else>Добавить</#if></button>
+    <div class="form-group">
+    <button type="submit" class="btn btn-primary"><#if edit??>Применить<#else>Добавить</#if></button>
+    </div>
 </#macro>

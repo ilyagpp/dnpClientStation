@@ -13,6 +13,7 @@ public interface TransactionsRepo extends JpaRepository<FuelTransaction, Long> {
 
     List<FuelTransaction> findByCreatorId(Long id);
 
+    Page<FuelTransaction> findByCreatorId(Long id, Pageable pageable);
 
     Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, LocalDateTime start, LocalDateTime end, Pageable pageable);
 

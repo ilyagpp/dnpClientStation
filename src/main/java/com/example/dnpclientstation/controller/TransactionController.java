@@ -123,7 +123,7 @@ public class TransactionController {
             transactionService.createOrUpdateTransaction(id, clientCard, fuelA, volume, price, nal, creator);
 
         } else model.addAttribute("error", "Вы забыли ввести объем");
-        return "redirect:/transactions";
+        return "redirect:/main-operator";
     }
 
     @PostMapping("/transaction/use")
@@ -163,7 +163,7 @@ public class TransactionController {
                 }
             }
 
-            return "redirect:/transactions";
+            return "redirect:/main-operator";
         } else {
             model.addAttribute("error", "Неверный пин!");
             model.addAttribute("referer",referer);
