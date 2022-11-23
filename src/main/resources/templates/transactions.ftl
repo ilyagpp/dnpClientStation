@@ -23,7 +23,7 @@
     </#if>
 
 
-    <@t.TimeRangeForm>
+    <@t.TimeRangeForm payType>
     </@t.TimeRangeForm>
 
     <div>
@@ -37,6 +37,7 @@
                 <th scope="col">Итог</th>
                 <th scope="col">Начислено/Списано</th>
                 <th scope="col">Карта</th>
+                <th scope="col">Тип оплаты</th>
                 <th scope="col">АЗС</th>
                 <th scope="col"></th>
                 <#if isAdmin><th scope="col"></th></#if>
@@ -58,6 +59,7 @@
                         <th scope="col">${transaction.total?string["0.00"]}</th>
                         <th scope="col">${transaction.bonus?string["0.00"]}</th>
                         <th scope="col">${transaction.cardNumber}</th>
+                        <th scope="col"><#if transaction.isNal()>НАЛ<#else>БЕЗНАЛ</#if></th>
                         <th scope="col">${transaction.creator.username}</th>
                         <#if transaction.creator.id == id || isAdmin>
                             <th scope="col">

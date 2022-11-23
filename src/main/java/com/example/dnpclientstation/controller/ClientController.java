@@ -6,6 +6,7 @@ import com.example.dnpclientstation.service.MailService;
 import com.example.dnpclientstation.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -38,15 +39,27 @@ public class ClientController {
 
     @GetMapping("/clients")
     public String getAllClients(Model model,
+                                @RequestParam (required = false) String search,
                                 @RequestParam (required = false) Integer size,
+                                @RequestHeader(required = false) String referer,
                                 @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable) {
 
+        model.addAttribute("size", size);
 
-        Page<Client> list = clientService.findAll(pageable);
+        if (search != null){
 
-        ControllerUtils.initPageSize(model, size, pageable);
-        model.addAttribute("url", "/clients");
-        model.addAttribute("page", list);
+            List<Client> searchClients = clientService.searchAll(search);
+            Page<Client> clients = new PageImpl<Client>(searchClients, pageable, searchClients.size());
+            model.addAttribute("page", clients);
+            model.addAttribute("search", search);
+            model.addAttribute("referer",referer.split("\\?")[0]);
+        }else {
+
+            Page<Client> list = clientService.findAll(pageable);
+            model.addAttribute("page", list);
+        }
+            ControllerUtils.initPageSize(model, size, pageable);
+            model.addAttribute("url", "/clients");
 
 
         return "/clients";

@@ -7,10 +7,7 @@ import com.example.dnpclientstation.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -28,23 +25,37 @@ public class CardController {
     @GetMapping("/cards")
     public String getCards(@RequestParam(required = false) Integer size,
                            @RequestParam(required = false) String free,
-                           Model model){
+                           @RequestParam(required = false) String search,
+                           @RequestHeader(required = false) String referer,
+                           Model model) {
 
-        if (free == null) {
-            List<ClientCard> cardsList = cardService.getAll()
-                    .stream().sorted(Comparator.comparing(ClientCard::getId))
-                    .collect(Collectors.toList());
 
+        if (search != null) {
+
+            model.addAttribute("search", search);
+            List<ClientCard> cardsList = cardService.search(search);
             model.addAttribute("cardsList", cardsList);
-            model.addAttribute("nameList", "Список карт");
+            model.addAttribute("nameList", "Поиск карт");
 
-        }else {
-            List<ClientCard> freeCards = cardService.getFree(size)
-                    .stream().sorted(Comparator.comparing(ClientCard::getId))
-                    .collect(Collectors.toList());
-            model.addAttribute("cardsList", freeCards);
-            model.addAttribute("nameList", "Список свободных карт");
+        } else {
 
+
+            if (free == null) {
+                List<ClientCard> cardsList = cardService.getAll()
+                        .stream().sorted(Comparator.comparing(ClientCard::getId))
+                        .collect(Collectors.toList());
+
+                model.addAttribute("cardsList", cardsList);
+                model.addAttribute("nameList", "Список карт");
+
+            } else {
+                List<ClientCard> freeCards = cardService.getFree(size)
+                        .stream().sorted(Comparator.comparing(ClientCard::getId))
+                        .collect(Collectors.toList());
+                model.addAttribute("cardsList", freeCards);
+                model.addAttribute("nameList", "Список свободных карт");
+
+            }
         }
         return "cards";
     }
@@ -52,7 +63,7 @@ public class CardController {
 
     @PostMapping("/cards")
     public String addNewCard(@RequestParam String cardNumber,
-                             Model model){
+                             Model model) {
 
 
         if (cardNumber.isEmpty()) {
@@ -66,7 +77,7 @@ public class CardController {
     }
 
     @PostMapping("/cards/auto")
-    public String autoNewCard(Model model){
+    public String autoNewCard(Model model) {
 
         cardService.automaitcCreateNewCard();
 
@@ -75,12 +86,12 @@ public class CardController {
 
     @PostMapping("/card/{card}")
     public String issueCard(@PathVariable ClientCard card,
-                                    @RequestParam String clientId,
-                                    Model model){
+                            @RequestParam String clientId,
+                            Model model) {
 
-        if (card != null && clientId!= null){
+        if (card != null && clientId != null) {
             Client client = clientService.findById(Long.valueOf(clientId)).orElse(null);
-            if (client != null){
+            if (client != null) {
                 client.setClientCard(card);
                 card.setClient(client);
                 cardService.save(card);
@@ -88,42 +99,42 @@ public class CardController {
                 model.addAttribute("cardMessage", "Успешно!");
                 model.addAttribute("card", card);
                 model.addAttribute("client", client);
-            }else model.addAttribute("error", "Выдача невозможна, произошла ошибка, попробуйте повторить процедуру заново!");
+            } else
+                model.addAttribute("error", "Выдача невозможна, произошла ошибка, попробуйте повторить процедуру заново!");
         }
 
 
-
-       return "/resultIssue";
+        return "/resultIssue";
 
     }
 
 
-
     @GetMapping("/card/{card}")
     public String getCardForIssue(
-                                  @PathVariable(required = false) ClientCard card,
-                                  @RequestParam(required = false) String search,
-                                  @RequestParam(required = false) String allFree,
-                                  @RequestParam(required = false) Client client,
-                                  Model model){
+            @PathVariable(required = false) ClientCard card,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String allFree,
+            @RequestParam(required = false) Client client,
+            Model model) {
 
-         if (card.getCardNumber()!=null) {
+        if (card.getCardNumber() != null) {
             model.addAttribute("card", card);
         } else {
             model.addAttribute("cardError", String.format("Карта с id номером %s не найдена в системе!", card.getId()));
         }
-            List<Client> freeClientList = clientService.findAllByClientCardIsNullOrderById();
-         model.addAttribute("clients", freeClientList);
-        if (search != null){
-           client = clientService.search(search);
-            if (client == null){
+        List<Client> freeClientList = clientService.findAllByClientCardIsNullOrderById();
+        model.addAttribute("clients", freeClientList);
+        if (search != null) {
+            client = clientService.search(search);
+            if (client == null) {
                 model.addAttribute("error", String.format("по запросу %s данные в системе отсутствуют, " +
-                        "\nвозможно вы сможете найти данные в списке клиентов без карты.",search));
+                        "\nвозможно вы сможете найти данные в списке клиентов без карты.", search));
             } else {
                 model.addAttribute("client", client);
-                if (client.getClientCard()== null){
+                if (client.getClientCard() == null) {
                     model.addAttribute("btnActivate", "true");
-                } else model.addAttribute("danger", String.format("Данному клиенту уже выдана карта %s", client.getClientCard().getCardNumber()));
+                } else
+                    model.addAttribute("danger", String.format("Данному клиенту уже выдана карта %s", client.getClientCard().getCardNumber()));
             }
         }
 
@@ -133,9 +144,9 @@ public class CardController {
 
     @GetMapping("/card/fr/{card}")
     public String withdrawCard(@PathVariable ClientCard card,
-                                Model model){
+                               Model model) {
 
-        if (card != null && card.getClient() != null){
+        if (card != null && card.getClient() != null) {
 
             Client client = clientService.findById(card.getClient().getId()).get();
             card.setClient(null);
@@ -143,14 +154,14 @@ public class CardController {
             cardService.save(card);
             clientService.save(client);
             model.addAttribute("message", String.format("Карта %s, изъята у клиента %s %s %s",
-                                                                    card.getCardNumber(),
-                                                                    client.getSurname(),
-                                                                    client.getName(),
-                                                                    client.getPhoneNumber()));
-        } else model.addAttribute("error", "Что-то пошло не так, попробуйте повторить операцию позже или сообщите администратору!");
+                    card.getCardNumber(),
+                    client.getSurname(),
+                    client.getName(),
+                    client.getPhoneNumber()));
+        } else
+            model.addAttribute("error", "Что-то пошло не так, попробуйте повторить операцию позже или сообщите администратору!");
         return "confirmCard";
     }
-
 
 
 }

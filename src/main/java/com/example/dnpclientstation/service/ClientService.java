@@ -10,9 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class ClientService {
@@ -85,6 +83,35 @@ public class ClientService {
 
         return client;
     }
+
+    public List<Client> searchAll(String search){
+
+        final List<Client> clients = new ArrayList<>();
+
+        String[] input = null;
+        if (search.contains(" ")){
+           input = search.split(" ");
+        } else {
+            input = new String[1];
+            input[0] = search;
+        }
+
+
+        for (String s: input) {
+            clientRepo.findAll().forEach(client -> {
+                if (client.getPhoneNumber().contains(s)
+                        || client.getName().toUpperCase().contains(s.toUpperCase())
+                        || client.getSurname().toUpperCase().contains(s.toUpperCase())
+                        || client.getClientCard().getCardNumber().contains(s)
+                        || client.getEmail().toUpperCase().contains(s.toUpperCase())) {
+                    clients.add(client);
+                }
+            });
+        }
+
+        return clients;
+    }
+
 
     public boolean checkEmail(String email) {
         return clientRepo.findByEmail(email) == null;

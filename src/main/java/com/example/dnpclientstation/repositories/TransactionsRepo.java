@@ -19,7 +19,6 @@ public interface TransactionsRepo extends JpaRepository<FuelTransaction, Long> {
 
     Page<FuelTransaction> findByCreateDateTimeBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
 
-    List<FuelTransaction> findByCreatorIdAndCreateDateTimeBetweenOrderByIdDesc(Long id, LocalDateTime start, LocalDateTime end);
-
-    Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetweenOrderByIdDesc(Long id, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    Page<FuelTransaction> findByCreateDateTimeBetweenAndNal(LocalDateTime start, LocalDateTime end, Pageable pageable, Boolean nal);
+    Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetweenAndNal(Long id, LocalDateTime start, LocalDateTime end, Pageable pageable, Boolean nal);
 }

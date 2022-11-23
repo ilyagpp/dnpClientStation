@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -26,49 +27,44 @@ public class CardService {
     private UserRepo userRepo;
 
 
-    public boolean save(ClientCard clientCard){
+    public boolean save(ClientCard clientCard) {
         if (clientCard != null) {
             cardRepo.save(clientCard);
 
-            log.info("Обновляем данные карты: "+ clientCard.toString());
+            log.info("Обновляем данные карты: " + clientCard.toString());
             return true;
         }
         return false;
     }
 
 
-    public void addNewCard(String cardNumber){
+    public void addNewCard(String cardNumber) {
 
-        if (cardRepo.findByCardNumber(cardNumber) != null){
+        if (cardRepo.findByCardNumber(cardNumber) != null) {
             return;
         }
 
         ClientCard clientCard = cardRepo.save(new ClientCard(cardNumber, (float) 0, null));
-        log.info("Добавлена новая карта: "+ clientCard);
+        log.info("Добавлена новая карта: " + clientCard);
     }
 
-    public String  getLastCardNumber() {
-
-        return cardRepo.findAll().stream()
-                .sorted((o1, o2) -> o2.getCardNumber().compareTo(o1.getCardNumber()))
-                .collect(Collectors.toList())
-                .get(0).getCardNumber();
+    public String getLastCardNumber() {
+        return cardRepo.findAllByOrderByIdDesc().get(0).getCardNumber();
     }
 
-    public List<ClientCard> getAll(){
-        return cardRepo.findAll();
+    public List<ClientCard> getAll() {
+        return cardRepo.findAllByOrderById();
     }
 
-    public List<ClientCard> getFree(Integer size){
+    public List<ClientCard> getFree(Integer size) {
 
-       return size !=null? cardRepo.findByClientIsNull()
-               .stream().sorted(Comparator.comparing(ClientCard::getId))
-               .limit(size).collect(Collectors.toList())
-               : cardRepo.findByClientIsNull();
-
+        return size != null ? cardRepo.findByClientIsNull()
+                .stream().sorted(Comparator.comparing(ClientCard::getId))
+                .limit(size).collect(Collectors.toList())
+                : cardRepo.findByClientIsNull();
     }
 
-    public Optional<ClientCard> getById(Long id){
+    public Optional<ClientCard> getById(Long id) {
         return cardRepo.findById(id);
     }
 
@@ -77,12 +73,23 @@ public class CardService {
         return cardRepo.findByCardNumber(cardNumber);
     }
 
-    public void automaitcCreateNewCard(){
+    public void automaitcCreateNewCard() {
 
-            Long number = Long.parseLong(getLastCardNumber()) +1;
-            String newNumber = String.valueOf(number);
-            addNewCard(newNumber);
+        Long number = Long.parseLong(getLastCardNumber()) + 1;
+        String newNumber = String.valueOf(number);
+        addNewCard(newNumber);
 
     }
 
+    public List<ClientCard> search(String search) {
+
+        List<ClientCard> result = new ArrayList<>();
+
+        cardRepo.findAllByOrderById().forEach(clientCard -> {
+                if (clientCard.getCardNumber().endsWith(search))
+                    result.add(clientCard);
+
+        });
+        return result;
+    }
 }

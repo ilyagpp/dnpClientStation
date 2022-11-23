@@ -35,6 +35,7 @@ public class TransactionController {
                                @RequestParam(required = false) String clientId,
                                @RequestParam(required = false) String showAll,
                                @RequestParam(required = false) Integer size,
+                               @RequestParam(required = false) Integer payType,
                                @AuthenticationPrincipal User creator,
                                Model model,
                                @RequestHeader(required = false) String referer,
@@ -71,10 +72,15 @@ public class TransactionController {
             }
 
         }
+        if (payType != null){
+            url = url +"&payType="+ payType;
+        }
+
         ControllerUtils.initPageSize(model, size, pageable);
         model.addAttribute("url", url);
-        Page<FuelTransaction> fuelTransactionPage = transactionService.findByCreatorIdAndCreateDateTimeBetween(creator.getId(), start, end, pageable, Boolean.parseBoolean(showAll));
+        Page<FuelTransaction> fuelTransactionPage = transactionService.findByCreatorIdAndCreateDateTimeBetween(creator.getId(), start, end, pageable, Boolean.parseBoolean(showAll), payType);
         model.addAttribute("page", fuelTransactionPage);
+        model.addAttribute("payType",  payType == null? 100 : payType);
 
 
         return "transactions";

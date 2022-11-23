@@ -18,6 +18,7 @@
                         <th scope="col">Итог</th>
                         <th scope="col">Начислено/Списано</th>
                         <th scope="col">Карта</th>
+                        <th scope="col">Тип оплаты</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,6 +39,7 @@
                             <th scope="col">${transaction.total?string["0.00"]}</th>
                             <th scope="col">${transaction.bonus?string["0.00"]}</th>
                             <th scope="col">${transaction.cardNumber}</th>
+                            <th scope="col"><#if transaction.isNal()>НАЛ<#else>БЕЗНАЛ</#if></th>
                         </tr>
                     </#list>
                     </tbody>

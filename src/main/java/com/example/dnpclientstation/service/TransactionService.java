@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotNull;
 import java.lang.Long;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,7 +59,7 @@ public class TransactionService {
         return result;
     }
 
-    public Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, String start, String end, Pageable pageable, boolean showAll) {
+    public Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, String start, String end, Pageable pageable, boolean showAll, Integer payType) {
 
         LocalDateTime startTime;
         if (StringUtils.isEmpty(start)) {
@@ -75,12 +76,28 @@ public class TransactionService {
             endTime = LocalDateTime.parse(end);
         }
 
+
+        if (payType != null && payType != 100){
+            Boolean nal = getPayType(payType);
+            if (showAll){
+                return transactionsRepo.findByCreateDateTimeBetweenAndNal(startTime, endTime, pageable, nal);
+            } else {
+                return transactionsRepo.findByCreatorIdAndCreateDateTimeBetweenAndNal(id, startTime, endTime, pageable, nal);
+            }
+
+
+        }else
         if (showAll){
             return transactionsRepo.findByCreateDateTimeBetween(startTime, endTime, pageable);
         } else {
 
             return transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(id, startTime, endTime, pageable);
         }
+    }
+
+    private Boolean getPayType(@NotNull Integer payType) {
+
+        return payType == 0;
     }
 
 
