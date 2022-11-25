@@ -22,6 +22,9 @@
                 <button class="btn btn-primary mr-2" type="submit">Новая карта</button>
             </form>
         </div>
+
+    </div>
+    <div class="form-row">
         <div>
             Поиск карты:
             <form method="get" class="form-inline">
@@ -32,7 +35,6 @@
             </form>
         </div>
     </div>
-
 
     <div>
         <table class="table mt-3">
