@@ -1,5 +1,6 @@
 package com.example.dnpclientstation.service;
 
+import com.example.dnpclientstation.domain.Client;
 import com.example.dnpclientstation.domain.ClientCard;
 import com.example.dnpclientstation.repositories.CardRepo;
 import com.example.dnpclientstation.repositories.UserRepo;
@@ -38,14 +39,15 @@ public class CardService {
     }
 
 
-    public void addNewCard(String cardNumber) {
+    public ClientCard addNewCard(String cardNumber) {
 
         if (cardRepo.findByCardNumber(cardNumber) != null) {
-            return;
+            return null;
         }
 
         ClientCard clientCard = cardRepo.save(new ClientCard(cardNumber, (float) 0, null));
         log.info("Добавлена новая карта: " + clientCard);
+        return clientCard;
     }
 
     public String getLastCardNumber() {
@@ -73,13 +75,14 @@ public class CardService {
         return cardRepo.findByCardNumber(cardNumber);
     }
 
-    public void automaitcCreateNewCard() {
+    public ClientCard automaticCreateNewCard() {
 
         Long number = Long.parseLong(getLastCardNumber()) + 1;
         String newNumber = String.valueOf(number);
-        addNewCard(newNumber);
+        return addNewCard(newNumber);
 
     }
+
 
     public List<ClientCard> search(String search) {
 

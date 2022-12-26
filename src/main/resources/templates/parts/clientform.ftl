@@ -14,7 +14,7 @@
         <#if edit??><input type="hidden" name="id" value="${client.getId()}"></#if>
         <label for="surname">Фамилия</label>
         <input type="text" name="surname" maxlength="50"
-               class="col-sm-5 form-control ${(surnameError??)?string('is-invalid', '')}" id="surname"
+               class="form-control ${(surnameError??)?string('is-invalid', '')} text-center" id="surname"
                value="<#if client??>${client.surname}</#if >">
         <#if surnameError??>
             <div class="invalid-feedback">
@@ -26,7 +26,7 @@
 
         <label for="name">Имя</label>
         <input type="text" name="name" maxlength="50"
-               class="col-sm-5 form-control ${(nameError??)?string('is-invalid', '')}" id="name"
+               class="form-control ${(nameError??)?string('is-invalid', '')} text-center" id="name"
                value="<#if client??>${client.name}</#if>">
         <#if nameError??>
             <div class="invalid-feedback">
@@ -36,7 +36,7 @@
     </div>
     <div class="form-group">
         <label for="patronymic">Отчество</label>
-        <input type="text" name="patronymic" maxlength="50" class="col-sm-5 form-control" id="patronymic"
+        <input type="text" name="patronymic" maxlength="50" class="form-control text-center" id="patronymic"
                 <#if client??> value="<#if client.patronymic??>${client.patronymic}</#if>"</#if>>
     </div>
     <div>Пол</div>
@@ -56,13 +56,13 @@
 
     <div class="form-group">
         <label for="birthday">Дата рождения</label>
-        <input type="date" name="birthday" class="col-sm-5 form-control" id="birthday"
+        <input type="date" name="birthday" class="form-control text-center" id="birthday"
                value="<#if edit?? && client.getBirthday()??>${client.birthday}</#if>">
     </div>
     <div class="form-group">
         <label for="phoneNumber">Телефон</label>
-        <input type="text" maxlength="10" class="col-sm-5 form-control ${(phoneNumberError??)?string('is-invalid', '')}"
-               name="phoneNumber" id="phoneNumber" aria-describedby="phoneNumberHelp" placeholder="(123)4567890"
+        <input type="text" maxlength="10" class="form-control ${(phoneNumberError??)?string('is-invalid', '')} text-center"
+               name="phoneNumber" id="phoneNumber" aria-describedby="phoneNumberHelp" placeholder="(123)4567890" oninput="changePhoneHandler(this)"
                 <#if client??> value="${client.phoneNumber}" </#if>>
         <small id="phoneNumberHelp" class="form-text text-muted">Номер вводится без +7</small>
         <#if phoneNumberError??>
@@ -70,11 +70,17 @@
                 ${phoneNumberError}
             </div>
         </#if>
+        <script type="text/javascript">
+            const changePhoneHandler = e =>{
+                const value = e.value
+                e.value = value.replace(/[^0-9]/g , '')
+            }
+        </script>
     </div>
 
     <div class="form-group">
         <label for="exampleInputEmail">Email</label>
-        <input type="email" maxlength="50" class="col-sm-5 form-control ${(emailError??)?string('is-invalid', '')}"
+        <input type="email" maxlength="50" class="form-control ${(emailError??)?string('is-invalid', '')} text-center"
                id="exampleInputEmail" name="email" aria-describedby="emailHelp" placeholder="введите email"
                <#if client??>value="${client.email}"</#if>>
         <small id="emailHelp" class="form-text text-muted">Ваш email</small>
@@ -84,7 +90,6 @@
             </div>
         </#if>
     </div>
-<#if isAdmin || isAzsAdmin>
     <div class="form-check">
         <input class="form-check-input" type="radio" name="active" id="active" value="true" checked>
         <label class="form-check-label" for="active">
@@ -94,7 +99,7 @@
     <#if !edit??>
       <div class="form-group">
           <label for="pin">Пин Код</label>
-          <input type="text" maxlength="4" class="col-sm-1 form-control ${(pinError??)?string('is-invalid', '')}"
+          <input type="text" maxlength="4" class="col-sm-2 form-control ${(pinError??)?string('is-invalid', '')} text-center"
                  name="pin" id="pin" aria-describedby="pinHelp" placeholder="****" oninput="changeHandler(this)">
           <small id="pinHelp" class="form-text text-muted">Пин генерируется автоматически, или введите пин по желанию, строго 4 цифры</small>
           <#if pinError??>
@@ -110,7 +115,6 @@
               }
           </script>
       </#if>
-</#if>
     <input type="hidden" name="_csrf" value="${_csrf.token}">
     <div class="form-group">
     <button type="submit" class="btn btn-primary"><#if edit??>Применить<#else>Добавить</#if></button>

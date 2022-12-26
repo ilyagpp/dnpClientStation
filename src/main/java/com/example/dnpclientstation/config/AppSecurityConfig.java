@@ -22,10 +22,10 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserService userService;
+    private  UserService userService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private  PasswordEncoder passwordEncoder;
 
 
     @Bean
@@ -35,7 +35,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Configuration
     @Order(1)
-    public static class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
+    public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
+
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
@@ -52,17 +53,24 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         }
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(userService)
+                    .passwordEncoder(passwordEncoder);
+        }
+
     }
 
     @Configuration
     @Order(2)
-    public static class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
                     .authorizeRequests()
-                    .antMatchers("/", "/registration", "/activate/*", "/static/**", "/check").permitAll()
+                    .antMatchers("/", "/registration", "/activate/*", "/static/**", "/mobile","/mobile/*").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .formLogin()
@@ -74,14 +82,19 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                     .logout()
                     .permitAll();
         }
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(userService)
+                    .passwordEncoder(passwordEncoder);
+        }
+
+
+
     }
 
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService)
-                .passwordEncoder(passwordEncoder);
-    }
+
 
 
 }

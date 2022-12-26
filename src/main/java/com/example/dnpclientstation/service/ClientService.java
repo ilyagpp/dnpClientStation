@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -23,6 +25,8 @@ public class ClientService {
 
     @Autowired
     CardService cardService;
+    @Autowired
+    private MailService mailService;
 
     public Optional<Client> findById(Long id) {
         return clientRepo.findById(id);
@@ -182,5 +186,61 @@ public class ClientService {
             log.info("Запрос на смену pin, для клиента: "+ client);
             return true;
         } else return false;
+    }
+
+    public boolean addNewOrEditClient(Client client, Model model) {
+        if (client.getId() == null) {
+
+            if (findByEmail(client.getEmail()) != null) {
+                model.addAttribute("emailError", "Пользователь с таким адресом уже существует!");
+                model.addAttribute("client", client);
+                return false;
+            }
+            if (findByPhoneNumber(client.getPhoneNumber()) != null) {
+                model.addAttribute("phoneNumberError", "Этот номер уже зарегистрирован в системе!");
+                model.addAttribute("client", client);
+                return false;
+            }
+
+            if (client.getPin().isEmpty()){
+                client.setPin(pinGenerator());
+            }
+
+
+            String message = mailService.sendClientRegistrationMessage(client);
+            if (message.contains("Fail")){
+                model.addAttribute(client);
+                model.addAttribute("emailError", "При отправке сообщения произошла ошибка, возможно данный email не существует!");
+                return false;
+            }
+            client.setAdded(LocalDateTime.now());
+
+
+        } else {
+            Client clientFromBD = findById(client.getId()).orElse(null);
+            if (client.getBirthday() == null) {
+                assert clientFromBD != null;
+                if (clientFromBD.getBirthday() != null) {
+                    client.setBirthday(clientFromBD.getBirthday());
+                }
+            }
+            assert clientFromBD != null;
+            client.setClientCard(clientFromBD.getClientCard());
+            client.setAdded(clientFromBD.getAdded());
+            client.setPin(clientFromBD.getPin());
+            model.addAttribute("edit", "true");
+        }
+
+        if (client.getClientCard()!= null){
+            save(client);
+        } else {
+            ClientCard card = cardService.automaticCreateNewCard();
+            client.setClientCard(card);
+            save(client);
+            card.setClient(client);
+            cardService.save(card);
+        }
+        return true;
+
     }
 }

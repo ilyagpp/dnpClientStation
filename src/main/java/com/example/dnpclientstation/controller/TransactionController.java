@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+
 import javax.validation.constraints.NotBlank;
 import java.lang.Long;
 import java.util.List;
@@ -45,7 +46,7 @@ public class TransactionController {
 
         String url = "/transactions";
 
-        if (showAll != null || referer.contains("showAll=true")) {
+        if (showAll != null  || (referer!= null && referer.contains("showAll=true"))) {
             model.addAttribute("showAll", showAll);
 
             url = url + "?showAll=true";
@@ -53,7 +54,7 @@ public class TransactionController {
         }
 
 
-        if (referer.contains("transactions")) {
+        if (referer != null && referer.contains("transactions")) {
             if (!StringUtils.isEmpty(start)) {
                 model.addAttribute("start", start);
                 if (!url.contains(start) && !url.contains("?")) {

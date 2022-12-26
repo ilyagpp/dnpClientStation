@@ -85,7 +85,7 @@ public class ClientController {
                 model.addAttribute("phoneNumberError", String.format("Номер %s уже зарегистрирован, попробуйте другой", client.getPhoneNumber()));
             }
 
-            
+
             if  (!StringUtils.isEmpty(client.getPin()) && client.getPin().length() != 4){
                 model.addAttribute("pinError","Не валидный пин");
             }
@@ -99,7 +99,7 @@ public class ClientController {
                 return "/client";
             }
         }
-        if (addNewOrEditClient(client, model)) {
+        if (clientService.addNewOrEditClient(client, model)) {
             return "clientOK";
         } else model.addAttribute("clientError", "Ошибка! Клиент не создан!");
 
@@ -107,11 +107,15 @@ public class ClientController {
 
     }
 
+
+
     @PostMapping("client/edit/{id}")
     public String updateClient(@Valid Client client,
                                BindingResult bindingResult,
+                               @RequestHeader(required = false) String referer,
                                Model model, @PathVariable Long id) {
         return addNewOrEditClient(client, bindingResult, model);
+
     }
 
     @GetMapping("client/edit/{id}")
@@ -251,51 +255,6 @@ public class ClientController {
     }
 
 
-    private boolean addNewOrEditClient(Client client, Model model) {
-        if (client.getId() == null) {
-
-            if (clientService.findByEmail(client.getEmail()) != null) {
-                model.addAttribute("emailError", "Пользователь с таким адресом уже существует!");
-                model.addAttribute("client", client);
-                return false;
-            }
-            if (clientService.findByPhoneNumber(client.getPhoneNumber()) != null) {
-                model.addAttribute("phoneNumberError", "Этот номер уже зарегистрирован в системе!");
-                model.addAttribute("client", client);
-                return false;
-            }
-
-            if (client.getPin().isEmpty()){
-                client.setPin(clientService.pinGenerator());
-            }
-
-            client.setAdded(LocalDateTime.now());
-            String message = mailService.sendClientRegistrationMessage(client);
-            if (message.contains("Fail")){
-                model.addAttribute(client);
-                model.addAttribute("emailError", "При отправке сообщения произошла ошибка, возможно данный email не существует!");
-                return false;
-            }
-
-        } else {
-            Client clientFromBD = clientService.findById(client.getId()).orElse(null);
-            if (client.getBirthday() == null) {
-                assert clientFromBD != null;
-                if (clientFromBD.getBirthday() != null) {
-                        client.setBirthday(clientFromBD.getBirthday());
-                    }
-            }
-            assert clientFromBD != null;
-            client.setClientCard(clientFromBD.getClientCard());
-            client.setAdded(clientFromBD.getAdded());
-            client.setPin(clientFromBD.getPin());
-            model.addAttribute("edit", "true");
-        }
-
-        clientService.save(client);
-        return true;
-
-    }
 
 
 }

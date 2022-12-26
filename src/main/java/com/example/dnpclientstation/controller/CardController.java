@@ -28,8 +28,9 @@ public class CardController {
                            @RequestParam(required = false) String search,
                            @RequestHeader(required = false) String referer,
                            Model model) {
-
-
+        if (size!= null && size < 0){
+            return "redirect:"+referer;
+        }
         if (search != null) {
 
             model.addAttribute("search", search);
@@ -79,7 +80,7 @@ public class CardController {
     @PostMapping("/cards/auto")
     public String autoNewCard(Model model) {
 
-        cardService.automaitcCreateNewCard();
+        cardService.automaticCreateNewCard();
 
         return "redirect:/cards";
     }
