@@ -10,6 +10,7 @@
         </div>
     </div>
 
+    <form id="reg">
     <div class="form-group">
         <#if edit??><input type="hidden" name="id" value="${client.getId()}"></#if>
         <label for="surname">Фамилия</label>
@@ -117,6 +118,8 @@
       </#if>
     <input type="hidden" name="_csrf" value="${_csrf.token}">
     <div class="form-group">
-    <button type="submit" class="btn btn-primary"><#if edit??>Применить<#else>Добавить</#if></button>
+
+    <button id="two" type="submit" class="btn btn-primary"><#if edit??>Применить<#else>Добавить</#if></button>
     </div>
+    </form>
 </#macro>
