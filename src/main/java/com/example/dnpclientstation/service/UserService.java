@@ -1,5 +1,6 @@
 package com.example.dnpclientstation.service;
 
+import com.example.dnpclientstation.domain.AZS;
 import com.example.dnpclientstation.domain.Role;
 import com.example.dnpclientstation.domain.User;
 import com.example.dnpclientstation.repositories.CardRepo;
@@ -121,14 +122,16 @@ public class UserService implements UserDetailsService {
         return userRepo.findAll();
     }
 
-    public void saveUser(User user, String username, Map<String, String> form) {
+    public void saveUser(User user, String username, String azsName,Map<String, String> form, Long azsId, Boolean clrAzs) {
         user.setUsername(username);
-
         Set<String> roles = Arrays.stream(Role.values())
                 .map(Role::name)
                 .collect(Collectors.toSet());
 
         user.getRoles().clear();
+
+        if (azsName != null)
+            user.setAzsName(azsName);
 
         for (String key : form.keySet()) {
             if (roles.contains(key)) {
@@ -136,8 +139,16 @@ public class UserService implements UserDetailsService {
             }
         }
 
+        if (clrAzs) {
+
+            clearAzs(user, azsId);
+        }
+
         userRepo.save(user);
     }
+
+
+
 
     public void updateProfile(User user, String password, String email) {
         String userEmail = user.getEmail();
@@ -159,5 +170,18 @@ public class UserService implements UserDetailsService {
         if (isEmailChanged) {
             sendRegistrationMessage(user);
         }
+    }
+
+    public void clearAzs(User user, Long azsId) {
+
+       boolean low = user.getAzs().getAzs_id().equals(azsId);
+
+       if (!low){
+
+           throw new IllegalArgumentException("Отвязать невозможно! Обратитесь к администратору");
+
+       } else {
+           user.setAzs(null);
+       }
     }
 }

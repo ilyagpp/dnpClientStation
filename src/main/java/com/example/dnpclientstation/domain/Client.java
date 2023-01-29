@@ -51,7 +51,7 @@ public class Client implements Persistable<java.lang.Long> {
     private boolean active;
 
 
-    @Email(message = "поле должно соответствовать типу: \"aUser@usermail.com\"")
+    @Email(message = "поле должно соответствовать типу: \"User@usermail.com\"")
     @NotBlank(message = "Поле не может быть пустым")
     @Column(unique = true)
     private String email;

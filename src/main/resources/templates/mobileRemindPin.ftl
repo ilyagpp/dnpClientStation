@@ -33,15 +33,24 @@
     <div class="card text-center" style="width: 24rem; background-color: azure; border: azure">
         <div class="card-body">
             <h5 class="card-title">Напомнить Пин-Код</h5>
-            <p class="card-text">Введите номер телефона</p>
+            <p class="card-text">Введите номер телефона без +7</p>
             <form method="get" action="/mobile/remind">
-                <input class="form-control text-center" type="search" name="phoneNumber" id="phoneNumber"
+                <input class="form-control text-center" type="tel" name="phoneNumber" id="phoneNumber"
                        placeholder="(123)4567890" aria-label="phoneNumber" oninput="changeHandler(this)">
                 <div class="mt-3">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Отправить</button>
+                    <button id="remind" class="btn btn-success my-2 my-sm-0" type="submit">Отправить</button>
                 </div>
-            </form>
 
+            </form>
+            <script type="text/javascript">
+                $(document).ready(function() {
+
+                    $('#remind').click(function () {
+                        $(this).attr('disabled', true);
+                        document.forms[0].submit();
+                    });
+                });
+            </script>
             <script type="text/javascript">
                 const changeHandler = e =>{
                     const value = e.value

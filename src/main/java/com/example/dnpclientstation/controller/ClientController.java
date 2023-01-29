@@ -17,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -142,7 +141,7 @@ public class ClientController {
 
         if (!result) {
             model.addAttribute("error", "К данному клиенту привязана карта, сначала карту необходимо отвязать!");
-            return "error";
+            return "er";
         } else {
             model.addAttribute("delete", "Удаление, успешно!");
             return "clientOK";
@@ -249,7 +248,7 @@ public class ClientController {
         }
         model.addAttribute("error", "При смене пин кода произошла ошибка!");
         model.addAttribute("referer", referer);
-        return "error";
+        return "er";
 
 
     }

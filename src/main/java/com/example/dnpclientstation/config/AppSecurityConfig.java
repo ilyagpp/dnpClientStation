@@ -47,6 +47,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .httpBasic()
                     .and()
+                    .headers().httpStrictTransportSecurity().disable()
+                    .and()
                     .csrf().disable()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -79,8 +81,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .rememberMe().tokenValiditySeconds(86400)
                     .and()
+                    .headers().httpStrictTransportSecurity().disable()
+                    .and()
                     .logout()
                     .permitAll();
+
+
         }
 
         @Override

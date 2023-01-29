@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller()
 
 public class AplErrorController implements ErrorController {
-//    @RequestMapping("/error")
-//    public String getErrorPage(Model model){
-//        model.addAttribute("error", "Упс... Кажется такой страницы нет!");
-//        return "error";
-//
-//    }
-//
+
+/*    @RequestMapping("/error")
+    public String getErrorPage(Model model){
+        model.addAttribute("error", "Упс... Кажется такой страницы нет!");
+        return "er";
+    }*/
+
     @Override
     public String getErrorPath() {
         return "/error";

@@ -39,11 +39,15 @@ public class UserController {
     public String userSave(
             @RequestParam String username,
             @RequestParam Map<String,String> form,
+            @RequestParam(required = false, defaultValue = "false") Boolean delAzs,
+            @RequestParam(required = false) Long azsId,
+            @RequestParam(required = false) String azsName,
             @RequestParam("userId") User user){
 
-       userService.saveUser(user, username, form);
+        userService.saveUser(user, username, azsName, form, azsId, delAzs);
         return "redirect:/user";
     }
+
 
     @GetMapping("profile")
     public String getProfile(Model model, @AuthenticationPrincipal User user){
@@ -57,7 +61,6 @@ public class UserController {
     public String updateProfile(@AuthenticationPrincipal User user,
                                 @RequestParam String password,
                                 @RequestParam String email){
-
 
         userService.updateProfile(user, password, email);
 

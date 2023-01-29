@@ -5,15 +5,16 @@
     <form method="post">
     <@clfm.clientform>
     </@clfm.clientform>
-    </form>
-    <script type="text/javascript">
-        $(document).ready(function() {
+        <script type="text/javascript">
+            $(document).ready(function() {
 
-            $('#two').click(function () {
-                $(this).attr('disabled', true); // Либо добавить атрибут disabled
-                document.forms[1].submit();
+                $('#two').click(function () {
+                    $(this).attr('disabled', true); // Либо добавить атрибут disabled
+                    document.forms[1].submit();
+                });
             });
-        });
-    </script>
+        </script>
+    </form>
+
     </div>
 </@c.page>

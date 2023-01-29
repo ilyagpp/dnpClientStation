@@ -60,7 +60,7 @@
                         <th scope="col">${transaction.bonus?string["0.00"]}</th>
                         <th scope="col">${transaction.cardNumber}</th>
                         <th scope="col"><#if transaction.isNal()>НАЛ<#else>БЕЗНАЛ</#if></th>
-                        <th scope="col">${transaction.creator.username}</th>
+                        <th scope="col">${transaction.creator.username!""}</th>
                         <#if transaction.creator.id == id || isAdmin>
                             <th scope="col">
                                 <a type="button" class="btn btn-outline-success btn-sm" href="transactions/edit/${transaction.id}">

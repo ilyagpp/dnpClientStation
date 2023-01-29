@@ -53,6 +53,17 @@
                     <a class="nav-link" aria-current="page" href="/user/profile">Профиль</a>
                 </li>
             </#if>
+            <#if isAdmin>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" aria-current="page"  href="#" id="CardWorkingSpace" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        АЗС
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="CardWorkingSpace">
+                        <a class="dropdown-item" href="/azs">Список АЗС</a>
+                        <a class="dropdown-item" href="/azs/new">Новая Азс</a>
+                    </div>
+                </li>
+            </#if>
            <#-- <li class="nav-item">
                 <a class="nav-link" aria-current="page" href="/main">Обратная связь</a>
             </li>-->

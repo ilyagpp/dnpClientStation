@@ -6,7 +6,7 @@
                 <#else>Новый клиент:</#if></h5>
         </div>
         <div class="card-body">
-            Заполните информацию о клиенте, поля "email" и "телефон" являются ОБЯЗАТЕЛЬНЫМИ!
+            Заполните информацию о клиенте, поля "фамилия", "имя", "email" и "телефон" являются ОБЯЗАТЕЛЬНЫМИ!
         </div>
     </div>
 
@@ -62,7 +62,7 @@
     </div>
     <div class="form-group">
         <label for="phoneNumber">Телефон</label>
-        <input type="text" maxlength="10" class="form-control ${(phoneNumberError??)?string('is-invalid', '')} text-center"
+        <input type="tel" maxlength="10" class="form-control ${(phoneNumberError??)?string('is-invalid', '')} text-center"
                name="phoneNumber" id="phoneNumber" aria-describedby="phoneNumberHelp" placeholder="(123)4567890" oninput="changePhoneHandler(this)"
                 <#if client??> value="${client.phoneNumber}" </#if>>
         <small id="phoneNumberHelp" class="form-text text-muted">Номер вводится без +7</small>
@@ -122,4 +122,20 @@
     <button id="two" type="submit" class="btn btn-primary"><#if edit??>Применить<#else>Добавить</#if></button>
     </div>
     </form>
+    <div class="card text-center my-3">
+        <small id="smtxt">
+            <div class="card-body">
+                В соответствии с требованиями статьи 9 Федерального закона от 27.07.06 N 152-ФЗ "О персональных данных",
+                нажимая кнопку "Добавить", вы выражаете свое согласие ООО «Дорисс-Нефтепродукт»,
+                расположенному по адресу: г. Чебоксары, Дорожный проезд д. 10, (далее — Оператор)
+                на обработку персональных данных, указанных в данной форме, в целях сбора и обработки
+                статистической информации и проведения маркетинговых исследований.
+            </div>
+        </small>
+    </div>
+    <style>
+        #smtxt{
+            font-size: 0.6rem;
+        }
+    </style>
 </#macro>

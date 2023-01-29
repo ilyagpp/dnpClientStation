@@ -35,7 +35,7 @@
             <h5 class="card-title">Проверить начисления</h5>
             <p class="card-text">Введите номер телефона</p>
             <form method="get">
-                <input class="form-control text-center" type="search" name="phoneNumber" id="phoneNumber"
+                <input class="form-control text-center" type="tel" name="phoneNumber" id="phoneNumber"
                        placeholder="(123)4567890" aria-label="phoneNumber" oninput="changeHandler(this)">
                 <div class="mt-3">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Найти</button>

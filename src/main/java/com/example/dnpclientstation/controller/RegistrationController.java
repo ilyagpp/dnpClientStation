@@ -67,7 +67,7 @@ public class RegistrationController {
             case 0:
                 return "redirect:/login";
 
-            default: return "error";
+            default: return "er";
         }
 
     }

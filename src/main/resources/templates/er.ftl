@@ -7,12 +7,9 @@
                 <h4>Произошла ошибка!</h4>
             </div>
             <div><a class="btn btn-outline-success" href="/main-operator" role="link">На главную</a></div>
-            <#if error??>
+            <#if clrError??>
                 <div class="alert alert-danger mt-3" role="alert">
-                    <h4>${error}</h4>
-                </div>
-                <div>
-                <#if referer??><a class="btn btn-outline-danger" href="${referer}" role="link">Назад</a></#if>
+                    <h4>${clrError}</h4>
                 </div>
             </#if>
 

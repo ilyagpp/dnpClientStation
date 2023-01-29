@@ -74,7 +74,11 @@ public class TransactionController {
 
         }
         if (payType != null){
-            url = url +"&payType="+ payType;
+            if (url.contains("?")) {
+                url = url + "&payType=" + payType;
+            } else {
+                url = url + "?payType=" + payType;
+            }
         }
 
         ControllerUtils.initPageSize(model, size, pageable);
@@ -82,6 +86,7 @@ public class TransactionController {
         Page<FuelTransaction> fuelTransactionPage = transactionService.findByCreatorIdAndCreateDateTimeBetween(creator.getId(), start, end, pageable, Boolean.parseBoolean(showAll), payType);
         model.addAttribute("page", fuelTransactionPage);
         model.addAttribute("payType",  payType == null? 100 : payType);
+        model.addAttribute("azs", creator.getAzsName()== null? creator.getUsername() : creator.getAzsName());
 
 
         return "transactions";
@@ -111,7 +116,7 @@ public class TransactionController {
 
             if (price == 0) {
                 model.addAttribute("error", "Цена не может быть нулевой");
-                return "error";
+                return "er";
             }
 
             float total;
@@ -166,7 +171,7 @@ public class TransactionController {
                     model.addAttribute("transactionComplete", "Успешно!");
                 } else {
                     model.addAttribute("error", "На карте недостаточно бонусов для списания!");
-                    return "error";
+                    return "er";
                 }
             }
 
@@ -174,7 +179,7 @@ public class TransactionController {
         } else {
             model.addAttribute("error", "Неверный пин!");
             model.addAttribute("referer",referer);
-            return "error";
+            return "er";
         }
 
     }
@@ -213,7 +218,7 @@ public class TransactionController {
           if (result == -1){
               model.addAttribute("error", "Удаление невозможно! Попробуйте снова, или обратитесь к Администратору системы.");
 
-              return "error";
+              return "er";
           } else
               return "redirect:"+ referer;
 

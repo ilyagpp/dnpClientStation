@@ -36,6 +36,29 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @ManyToOne
+    @JoinColumn(name = "azs_id")
+    private AZS azs;
+
+    private String azsName;
+
+
+    
+    public AZS getAzs() {
+        return azs;
+    }
+
+    public void setAzs(AZS azs) {
+        this.azs = azs;
+    }
+
+    public String getAzsName() {
+        return azsName;
+    }
+
+    public void setAzsName(String azsName) {
+        this.azsName = azsName;
+    }
 
     public String getEmail() {
         return email;
@@ -128,9 +151,10 @@ public class User implements UserDetails {
 
     @Override
     public String toString() {
-        return "Creator{" +
-                "id= " + id +
-                ", username= '" + username + '\'' +
+        return "User{" +
+                ", username='" + username + '\'' +
+                ", azs=" + azs +
+                ", azs_name='" + azsName + '\'' +
                 '}';
     }
 }
