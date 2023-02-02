@@ -1,6 +1,5 @@
 package com.example.dnpclientstation.service;
 
-import com.example.dnpclientstation.domain.AZS;
 import com.example.dnpclientstation.domain.Role;
 import com.example.dnpclientstation.domain.User;
 import com.example.dnpclientstation.repositories.CardRepo;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -122,6 +120,11 @@ public class UserService implements UserDetailsService {
         return userRepo.findAll();
     }
 
+
+    public List<User> findAllOrderById(){
+        return userRepo.findAllByOrderById();
+    }
+
     public void saveUser(User user, String username, String azsName,Map<String, String> form, Long azsId, Boolean clrAzs) {
         user.setUsername(username);
         Set<String> roles = Arrays.stream(Role.values())
@@ -184,4 +187,5 @@ public class UserService implements UserDetailsService {
            user.setAzs(null);
        }
     }
+
 }

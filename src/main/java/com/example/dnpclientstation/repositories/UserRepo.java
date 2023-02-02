@@ -1,8 +1,10 @@
 package com.example.dnpclientstation.repositories;
 
 import com.example.dnpclientstation.domain.User;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepo extends JpaRepository<User, Long> {
@@ -13,4 +15,6 @@ public interface UserRepo extends JpaRepository<User, Long> {
     User findByEmail(String email);
 
     User findByActivationCode(String code);
+
+    List <User> findAllByOrderById();
 }

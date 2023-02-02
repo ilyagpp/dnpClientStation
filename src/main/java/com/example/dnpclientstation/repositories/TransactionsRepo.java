@@ -12,13 +12,15 @@ import java.util.List;
 public interface TransactionsRepo extends JpaRepository<FuelTransaction, Long> {
 
     List<FuelTransaction> findByCreatorId(Long id);
-
+    List<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, LocalDateTime start, LocalDateTime end);
+    List<FuelTransaction> findByCreateDateTimeBetween(LocalDateTime start, LocalDateTime end);
     Page<FuelTransaction> findByCreatorId(Long id, Pageable pageable);
 
+
     Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, LocalDateTime start, LocalDateTime end, Pageable pageable);
-
     Page<FuelTransaction> findByCreateDateTimeBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
-
     Page<FuelTransaction> findByCreateDateTimeBetweenAndNal(LocalDateTime start, LocalDateTime end, Pageable pageable, Boolean nal);
     Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetweenAndNal(Long id, LocalDateTime start, LocalDateTime end, Pageable pageable, Boolean nal);
+    Page<FuelTransaction> findByCreateDateTimeBetweenAndNalAndAccumulate(LocalDateTime start, LocalDateTime end, Pageable pageable, Boolean nal, Boolean accumulate);
+    Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetweenAndNalAndAccumulate(Long id, LocalDateTime start, LocalDateTime end, Pageable pageable, Boolean nal,Boolean accumulate);
 }

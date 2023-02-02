@@ -25,7 +25,7 @@ public class AZSController {
 
 
     @GetMapping("/azs")
-    public String azsList(Model model){
+    public String azsList(Model model) {
 
         List<AZS> azsList = new ArrayList<>();
         azsList = azsService.getAll();
@@ -38,7 +38,7 @@ public class AZSController {
 
     @GetMapping("/azs/new")
     public String newAzs(Model model,
-                         @RequestParam(required = false) AZS azs){
+                         @RequestParam(required = false) AZS azs) {
 
         getFreeUsers(model);
 
@@ -51,8 +51,8 @@ public class AZSController {
                                  @Valid AZS azs,
                                  BindingResult bindingResult,
                                  @RequestParam(required = false) String edit,
-                                 @RequestParam(required = false) Map<String,String> form,
-                                 @RequestHeader(required = false) String referer){
+                                 @RequestParam(required = false) Map<String, String> form,
+                                 @RequestHeader(required = false) String referer) {
 
         Set<String> azsIds = new TreeSet<>();
 
@@ -80,7 +80,7 @@ public class AZSController {
 
     @GetMapping("/azs/{azsId}")
     public String getAzs(@PathVariable Long azsId,
-                          Model model){
+                         Model model) {
 
         AZS azs = azsService.findById(azsId);
         if (!azs.isNew()) {
@@ -95,9 +95,8 @@ public class AZSController {
     }
 
 
-
     private void getFreeUsers(Model model) {
-        List<User> users = userService.findAll().stream()
+        List<User> users = userService.findAllOrderById().stream()
                 .filter(user -> user.getAzs() == null)
                 .collect(Collectors.toList());
         model.addAttribute("freeUsers", users);

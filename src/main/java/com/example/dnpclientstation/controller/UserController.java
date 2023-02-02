@@ -4,6 +4,7 @@ import com.example.dnpclientstation.domain.Role;
 import com.example.dnpclientstation.domain.User;
 import com.example.dnpclientstation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,8 +21,9 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping
-    public String userList(Model model){
-        model.addAttribute("users", userService.findAll());
+    public String userList(Model model,
+                           @RequestParam(required = false) Sort sort){
+        model.addAttribute("users", userService.findAllOrderById());
         return "userList";
     }
 

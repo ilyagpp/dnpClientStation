@@ -5,6 +5,6 @@
     <div class="mb-3">АЗС Дорисс</div>
     <div>
         <a class="btn btn-success btn-lg" href="/main-operator" role="link">Авторизация</a>
-        <a class="btn btn-danger btn-lg" href="/registration" role="link">Регистрация</a>
+        <a class="btn btn-danger btn-lg disabled" href="/registration" role="link">Регистрация</a>
     </div>
 </@c.page>

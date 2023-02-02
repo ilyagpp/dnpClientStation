@@ -19,6 +19,8 @@ public class TerminalTransaction extends FuelTransaction {
 
     private Boolean pinStatus;
 
+    private Boolean accumulate;
+
 
     public TerminalTransaction() {
 
@@ -48,20 +50,20 @@ public class TerminalTransaction extends FuelTransaction {
         this.totalT = totalT;
     }
 
-    public TerminalTransaction(Long id, String fuel, float price, float volume, float total, boolean nal, User creator, Boolean pinStatus) {
-        super(id, fuel, price, volume, total, nal, creator);
+    public TerminalTransaction(Long id, String fuel, float price, float volume, float total, boolean nal, User creator, Boolean pinStatus, Boolean accumulate) {
+        super(id, fuel, price, volume, total, nal, creator, accumulate);
 
-        this.volumeT = (int)(volume * 1000);
+        this.volumeT = (int) (volume * 1000);
         this.totalT = (int) (total * 100);
         this.priceT = (int) (price * 100);
         this.pinStatus = pinStatus;
     }
 
 
-    public TerminalTransaction(FuelTransaction fuelTransaction, Boolean pinStatus){
-        super(fuelTransaction.getId(), fuelTransaction.getCreateDateTime(), fuelTransaction.getUpdateDateTime() ,fuelTransaction.getFuel(), fuelTransaction.getPrice(),
+    public TerminalTransaction(FuelTransaction fuelTransaction, Boolean pinStatus, Boolean accumulate) {
+        super(fuelTransaction.getId(), fuelTransaction.getCreateDateTime(), fuelTransaction.getUpdateDateTime(), fuelTransaction.getFuel(), fuelTransaction.getPrice(),
                 fuelTransaction.getVolume(), fuelTransaction.getTotal(), fuelTransaction.getCardNumber(),
-                fuelTransaction.getBonus(), fuelTransaction.isNal(), fuelTransaction.getCreator());
+                fuelTransaction.getBonus(), fuelTransaction.isNal(), fuelTransaction.getCreator(), accumulate);
 
         this.volumeT = (int) (fuelTransaction.getVolume() * 1000);
         this.totalT = (int) (fuelTransaction.getTotal() * 100);

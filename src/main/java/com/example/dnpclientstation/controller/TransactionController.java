@@ -37,6 +37,7 @@ public class TransactionController {
                                @RequestParam(required = false) String showAll,
                                @RequestParam(required = false) Integer size,
                                @RequestParam(required = false) Integer payType,
+                               @RequestParam(required = false) Integer operationType,
                                @AuthenticationPrincipal User creator,
                                Model model,
                                @RequestHeader(required = false) String referer,
@@ -81,11 +82,20 @@ public class TransactionController {
             }
         }
 
+        if (operationType != null){
+            if (url.contains("?")) {
+                url = url + "&operationType=" + operationType;
+            } else {
+                url = url + "?operationType=" + operationType;
+            }
+        }
+
         ControllerUtils.initPageSize(model, size, pageable);
         model.addAttribute("url", url);
-        Page<FuelTransaction> fuelTransactionPage = transactionService.findByCreatorIdAndCreateDateTimeBetween(creator.getId(), start, end, pageable, Boolean.parseBoolean(showAll), payType);
+        Page<FuelTransaction> fuelTransactionPage = transactionService.findByCreatorIdAndCreateDateTimeBetween(creator.getId(), start, end, pageable, Boolean.parseBoolean(showAll), payType, operationType);
         model.addAttribute("page", fuelTransactionPage);
         model.addAttribute("payType",  payType == null? 100 : payType);
+        model.addAttribute("operationType", operationType == null? 100 : operationType);
         model.addAttribute("azs", creator.getAzsName()== null? creator.getUsername() : creator.getAzsName());
 
 
@@ -132,7 +142,7 @@ public class TransactionController {
                     volume = Float.parseFloat(input);
             }
 
-            transactionService.createOrUpdateTransaction(id, clientCard, fuelA, volume, price, nal, creator);
+            transactionService.createOrUpdateTransaction(id, clientCard, fuelA, volume, price, nal, creator, true);
 
         } else model.addAttribute("error", "Вы забыли ввести объем");
         return "redirect:/main-operator";
@@ -165,7 +175,7 @@ public class TransactionController {
                 String fuelA = ControllerUtils.checkByСomma(input[0]);
                 Float price = Float.valueOf(ControllerUtils.checkByСomma(input[1]));
 
-                FuelTransaction transaction = transactionService.useBonus(id, fuelA, clientCard, Float.valueOf(bonus), price, nal, creator);
+                FuelTransaction transaction = transactionService.useBonus(id, fuelA, clientCard, Float.valueOf(bonus), price, nal, creator, false);
 
                 if (transaction != null) {
                     model.addAttribute("transactionComplete", "Успешно!");

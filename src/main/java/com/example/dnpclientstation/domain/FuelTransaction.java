@@ -47,6 +47,7 @@ public class FuelTransaction implements Persistable<Long> {
             "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
     private User creator;
 
+    private Boolean accumulate;
 
     private Boolean nal;
 
@@ -59,7 +60,7 @@ public class FuelTransaction implements Persistable<Long> {
     public FuelTransaction() {
     }
 
-    public FuelTransaction(Long id, String fuel, float price, float volume, float total, boolean nal, User creator) {
+    public FuelTransaction(Long id, String fuel, float price, float volume, float total, boolean nal, User creator, boolean accumulate) {
         this.id = id;
         this.createDateTime = LocalDateTime.now();
         this.updateDateTime = LocalDateTime.now();
@@ -69,9 +70,11 @@ public class FuelTransaction implements Persistable<Long> {
         this.total = total;
         this.nal = nal;
         this.creator = creator;
+        this.accumulate = accumulate;
     }
 
-    public FuelTransaction(Long id, LocalDateTime createDateTime, LocalDateTime updateDateTime, String fuel, float price, float volume, float total, String cardNumber, Float bonus, boolean nal, User creator) {
+
+    public FuelTransaction(Long id, LocalDateTime createDateTime, LocalDateTime updateDateTime, String fuel, float price, float volume, float total, String cardNumber, Float bonus, boolean nal, User creator, boolean accumulate) {
         this.id = id;
         this.createDateTime = createDateTime;
         this.updateDateTime = updateDateTime;
@@ -83,7 +86,9 @@ public class FuelTransaction implements Persistable<Long> {
         this.bonus = bonus;
         this.nal = nal;
         this.creator = creator;
+        this.accumulate = accumulate;
     }
+
 
     public void setId(Long id) {
         this.id = id;
@@ -178,6 +183,19 @@ public class FuelTransaction implements Persistable<Long> {
     public boolean isNew() {
         return id == null;
     }
+    public Boolean isAccumulate() {
+        return accumulate;
+    }
+
+    public void setAccumulate(Boolean accumulate) {
+        this.accumulate = accumulate;
+    }
+
+    public String operationType(){
+        if (accumulate) {return "Накопление";}
+        else return "списание";
+
+    }
 
     @Override
     public String toString() {
@@ -185,6 +203,7 @@ public class FuelTransaction implements Persistable<Long> {
                 "id=" + id +
                 ", createDateTime=" + createDateTime.toLocalDate() + " " + createDateTime.toLocalTime()+
                 ", updateDateTime=" + updateDateTime.toLocalDate() + " " + updateDateTime.toLocalTime()+
+                ", тип операции ="+ operationType() +
                 ", fuel='" + fuel + '\'' +
                 ", price=" + price +
                 ", volume=" + volume +

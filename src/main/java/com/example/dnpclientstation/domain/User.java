@@ -53,7 +53,7 @@ public class User implements UserDetails {
     }
 
     public String getAzsName() {
-        return azsName;
+        return azsName != null? azsName: "";
     }
 
     public void setAzsName(String azsName) {
@@ -153,8 +153,7 @@ public class User implements UserDetails {
     public String toString() {
         return "User{" +
                 ", username='" + username + '\'' +
-                ", azs=" + azs +
-                ", azs_name='" + azsName + '\'' +
+                ", azs_name='" + getAzsName() +
                 '}';
     }
 }

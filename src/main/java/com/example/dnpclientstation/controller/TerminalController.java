@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -61,17 +62,20 @@ public class TerminalController {
                                                       @RequestParam @NotBlank String cardNumber,
                                                       @RequestParam @NotBlank String fuel,
                                                       @RequestParam @NotNull Integer price,
+                                                      Principal principal,
                                                       @RequestParam @NotNull Integer volume) {
 
         Optional<User> creator = userService.findById(term_id);
-        if (creator.isPresent()) {
+        if (creator.isPresent() && creator.get().getUsername().equals(principal.getName())) {
             FuelTransaction fuelTransaction =
-                    transactionService.createOrUpdateTransaction(id, cardNumber, fuel, TransactionService.convertIntToFloat(volume,3), TransactionService.convertIntToFloat(price, 2), nal, creator.get());
+                    transactionService.createOrUpdateTransaction(id, cardNumber, fuel, TransactionService.convertIntToFloat(volume,3),
+                            TransactionService.convertIntToFloat(price, 2), nal, creator.get(), true);
+
             if (id != null){
-                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false), HttpStatus.ACCEPTED)
+                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false , true), HttpStatus.ACCEPTED)
                         : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             } else
-            return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false), HttpStatus.CREATED)
+            return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false, true), HttpStatus.CREATED)
                     : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
@@ -85,27 +89,30 @@ public class TerminalController {
                                                         @RequestParam String fuel,
                                                         @RequestParam String cardNumber,
                                                         @RequestParam Integer price,
+                                                        Principal principal,
                                                         @RequestParam @Length(max = 4, min = 4) String pin) {
 
 
         Optional<User> creator = userService.findById(term_id);
 
-        if (creator.isPresent()) {
+
+        if (creator.isPresent() && creator.get().getUsername().equals(principal.getName())) {
 
             boolean checkPin = transactionService.checkPin(cardNumber, pin);
             if (!checkPin) {
-                return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), false), HttpStatus.BAD_REQUEST);
+                TerminalTransaction transaction = new TerminalTransaction(new FuelTransaction(), false , false);
+                return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), false, false), HttpStatus.BAD_REQUEST);
             }
 
-            FuelTransaction transaction = transactionService.useBonus(id, fuel, cardNumber, bonus, TransactionService.convertIntToFloat(price,2), nal, creator.get());
+            FuelTransaction transaction = transactionService.useBonus(id, fuel, cardNumber, bonus, TransactionService.convertIntToFloat(price,2), nal, creator.get(), false);
 
             if (transaction != null) {
                 if (id != null){
-                    return new ResponseEntity<>(new TerminalTransaction(transaction, true), HttpStatus.ACCEPTED);
+                    return new ResponseEntity<>(new TerminalTransaction(transaction, true ,false), HttpStatus.ACCEPTED);
                 }else
-                return new ResponseEntity<>(new TerminalTransaction(transaction, true), HttpStatus.CREATED);
+                return new ResponseEntity<>(new TerminalTransaction(transaction, true, false), HttpStatus.CREATED);
             } else {
-                return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), true), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), true, false), HttpStatus.BAD_REQUEST);
             }
         } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }

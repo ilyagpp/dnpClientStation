@@ -1,5 +1,5 @@
 <#include "security.ftl">
-<#macro TimeRangeForm payType>
+<#macro TimeRangeForm payType operationType>
     <form method="get" class="form-inline mt-3">
     <span class="form-inline">
     <#if isAdmin>
@@ -38,10 +38,24 @@
           </select>
         </div>
     </div>
+        <div class="col">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="operationType">Операция</label>
+          </div>
+          <select class="custom-select" id="operationType" name="operationType">
+            <option <#if operationType?? && operationType ==100> selected</#if> value="100">Все</option>
+            <option <#if operationType?? && operationType ==0> selected</#if> value="0">НАКОП</option>
+            <option <#if operationType?? && operationType ==1> selected</#if> value="1">СПИС</option>
+          </select>
+        </div>
+    </div>
         <input type="hidden" name="size" value="${size}">
     <button class="btn btn-primary" type="submit">Показать</button>
-    </span>
+
         <a class="btn btn-primary ml-3" href="/transactions" role="link">Сброс</a>
+    </span>
     </form>
+
 </#macro>
 

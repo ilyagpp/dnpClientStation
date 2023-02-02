@@ -1,6 +1,5 @@
 package com.example.dnpclientstation.service;
 
-import com.example.dnpclientstation.domain.Client;
 import com.example.dnpclientstation.domain.ClientCard;
 import com.example.dnpclientstation.repositories.CardRepo;
 import com.example.dnpclientstation.repositories.UserRepo;
@@ -27,6 +26,7 @@ public class CardService {
     @Autowired
     private UserRepo userRepo;
 
+    private final String STARTCARDNUMBER =  String.valueOf(1100962000000L);
 
     public boolean save(ClientCard clientCard) {
         if (clientCard != null) {
@@ -51,7 +51,8 @@ public class CardService {
     }
 
     public String getLastCardNumber() {
-        return cardRepo.findAllByOrderByIdDesc().get(0).getCardNumber();
+        String result = cardRepo.findAllByOrderByIdDesc().get(0).getCardNumber();
+        return result != null? result : STARTCARDNUMBER;
     }
 
     public List<ClientCard> getAll() {

@@ -23,7 +23,7 @@
     </#if>
 
 
-    <@t.TimeRangeForm payType>
+    <@t.TimeRangeForm payType operationType>
     </@t.TimeRangeForm>
 
     <div>
@@ -38,6 +38,7 @@
                 <th scope="col">Начислено/Списано</th>
                 <th scope="col">Карта</th>
                 <th scope="col">Тип оплаты</th>
+                <th scope="col">Операция</th>
                 <th scope="col">АЗС</th>
                 <th scope="col"></th>
                 <#if isAdmin><th scope="col"></th></#if>
@@ -60,7 +61,8 @@
                         <th scope="col">${transaction.bonus?string["0.00"]}</th>
                         <th scope="col">${transaction.cardNumber}</th>
                         <th scope="col"><#if transaction.isNal()>НАЛ<#else>БЕЗНАЛ</#if></th>
-                        <th scope="col">${transaction.creator.username!""}</th>
+                        <th scope="col"><#if transaction.isAccumulate()>Накоп.<#else>Списание</#if></th>
+                        <th scope="col"><#if transaction.creator.getAzsName()??>${transaction.creator.getAzsName()!""}<#else>${transaction.creator.username!""}</#if> </th>
                         <#if transaction.creator.id == id || isAdmin>
                             <th scope="col">
                                 <a type="button" class="btn btn-outline-success btn-sm" href="transactions/edit/${transaction.id}">

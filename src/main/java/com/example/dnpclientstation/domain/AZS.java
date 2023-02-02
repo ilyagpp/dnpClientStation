@@ -44,7 +44,7 @@ public class AZS {
 
 
     public String getProperties() {
-        return properties;
+        return properties != null? properties: "";
     }
 
     public void setProperties(String properties) {
@@ -68,7 +68,7 @@ public class AZS {
     }
 
     public String getAzsName() {
-        return azsName;
+        return azsName != null? azsName : "";
     }
 
     public void setAzsName(String azsName) {

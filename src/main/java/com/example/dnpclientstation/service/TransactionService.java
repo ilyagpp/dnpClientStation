@@ -1,15 +1,13 @@
 package com.example.dnpclientstation.service;
 
+import com.example.dnpclientstation.controller.ControllerUtils;
 import com.example.dnpclientstation.domain.*;
 import com.example.dnpclientstation.repositories.TransactionsRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -17,8 +15,9 @@ import org.springframework.util.StringUtils;
 import javax.validation.constraints.NotNull;
 import java.lang.Long;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 public class TransactionService {
@@ -59,7 +58,7 @@ public class TransactionService {
         return result;
     }
 
-    public Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, String start, String end, Pageable pageable, boolean showAll, Integer payType) {
+    public Page<FuelTransaction> findByCreatorIdAndCreateDateTimeBetween(Long id, String start, String end, Pageable pageable, boolean showAll, Integer payType, Integer operationType) {
 
         LocalDateTime startTime;
         if (StringUtils.isEmpty(start)) {
@@ -76,33 +75,69 @@ public class TransactionService {
             endTime = LocalDateTime.parse(end);
         }
 
+        boolean payTypeNotAll = ((payType!= null) && (payType != 100));
+        boolean operationNotAll = ((operationType != null) && (operationType !=100));
 
-        if (payType != null && payType != 100){
-            Boolean nal = getPayType(payType);
-            if (showAll){
-                return transactionsRepo.findByCreateDateTimeBetweenAndNal(startTime, endTime, pageable, nal);
-            } else {
-                return transactionsRepo.findByCreatorIdAndCreateDateTimeBetweenAndNal(id, startTime, endTime, pageable, nal);
-            }
+        boolean isNalType = getType(payType);
+
+        boolean isAccumType = getType(operationType);
 
 
-        }else
-        if (showAll){
-            return transactionsRepo.findByCreateDateTimeBetween(startTime, endTime, pageable);
-        } else {
-
-            return transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(id, startTime, endTime, pageable);
+        List<FuelTransaction> transactionList = new ArrayList<>();
+        if (showAll) {
+            transactionList = transactionsRepo.findByCreateDateTimeBetween(startTime, endTime);
+        } else{
+            transactionList = transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(id, startTime, endTime);
         }
+
+        List<FuelTransaction> resulTlist =  transactionList.stream()
+                .filter( fuelTransaction -> {
+            if (payTypeNotAll) {
+               return fuelTransaction.isNal().booleanValue() == isNalType;
+            }
+            if (operationNotAll){
+                return fuelTransaction.isAccumulate().booleanValue() == isAccumType;
+            }
+            return true;
+        })
+                .collect(Collectors.toList());
+
+        resulTlist.sort(comparator.reversed());
+
+        Page<FuelTransaction> page = (Page<FuelTransaction>) ControllerUtils.listToPage(pageable, resulTlist);
+        return page;
+
     }
 
-    private Boolean getPayType(@NotNull Integer payType) {
+    Comparator<FuelTransaction> comparator = new Comparator<FuelTransaction>() {
+        @Override
+        public int compare(FuelTransaction o1, FuelTransaction o2) {
+            if (o1.getId() == o2.getId()) {
+                return 0;
+            }
+            return o1.getId() > o2.getId() ? 1 : -1;
+        }
 
-        return payType == 0;
+    };
+
+
+
+    public int getStartIndex (Pageable pageable){
+
+        if (pageable.getPageNumber() == 0) return 0;
+        return pageable.getPageNumber()* pageable.getPageSize();
+
+
+    }
+
+    private Boolean getType(Integer action) {
+        if (action == null) return  false;
+        return action == 0;
     }
 
 
     @Transactional(readOnly = false)
-    public FuelTransaction createOrUpdateTransaction(Long id, String cardNumber, String fuel, Float volume, Float price, Boolean nal, User creator) {
+    public FuelTransaction createOrUpdateTransaction(Long id, String cardNumber, String fuel, Float volume, Float price, Boolean nal, User creator, Boolean accumulate) {
 
         String operation = "'накопление бонусов'";
 
@@ -154,7 +189,7 @@ public class TransactionService {
                 }
 
             }
-
+            transaction.setAccumulate(accumulate);
             transaction.setVolume(volume);
 
             if (price != null) {
@@ -190,6 +225,7 @@ public class TransactionService {
             transaction.setBonus(getTotal(volume, price) * getBonusPercent());
             transaction.setCreator(creator);
             transaction.setNal(nal);
+            transaction.setAccumulate(accumulate);
         }
         clientCard.setBonus(clientCard.getBonus() + transaction.getBonus());
         cardService.save(clientCard);
@@ -224,7 +260,7 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = false)
-    public FuelTransaction useBonus(Long id, String fuel, String cardNumber, Float bonus, Float price, Boolean nal, User creator) {
+    public FuelTransaction useBonus(Long id, String fuel, String cardNumber, Float bonus, Float price, Boolean nal, User creator, Boolean accumulate) {
 
         String operation = "Списание бонусов";
         ClientCard card = cardService.findByCardNumber(cardNumber);
@@ -255,7 +291,7 @@ public class TransactionService {
                 updateUseBonusTransaction.setTotal(bonus);
                 updateUseBonusTransaction.setNal(nal);
                 card.setBonus(card.getBonus() - bonus);
-
+                updateUseBonusTransaction.setAccumulate(accumulate);
                 cardService.save(card);
 
                 FuelTransaction resultTransaction = transactionsRepo.save(updateUseBonusTransaction);
@@ -279,6 +315,7 @@ public class TransactionService {
                 useBonusTransaction.setPrice(price);
                 useBonusTransaction.setVolume(getVolume(bonus, price));
                 useBonusTransaction.setTotal(bonus);
+                useBonusTransaction.setAccumulate(accumulate);
                 try {
                     useBonusTransaction.setFuel(FuelUtil.convert(fuel));
                 }catch (NumberFormatException e){
