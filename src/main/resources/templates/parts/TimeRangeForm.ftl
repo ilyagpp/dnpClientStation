@@ -1,11 +1,10 @@
 <#include "security.ftl">
 <#macro TimeRangeForm payType operationType>
-    <form method="get" class="form-inline mt-3">
+    <form id="timerangeform" method="get" class="form-inline mt-3">
     <span class="form-inline">
     <#if isAdmin>
-
         <div class="form-check">
-                <label class="mr-1" for="defaultCheck1">Показать все</label>
+                <label class="mr-1" for="defaultCheck1">Все</label>
             <input class="form-check-input"
                    type="checkbox" name="showAll"
                    id="defaultCheck1" value="true"
@@ -56,6 +55,10 @@
         <a class="btn btn-primary ml-3" href="/transactions" role="link">Сброс</a>
     </span>
     </form>
-
+<style>
+    #timerangeform{
+        font-size: 0.8rem;
+    }
+</style>
 </#macro>
 

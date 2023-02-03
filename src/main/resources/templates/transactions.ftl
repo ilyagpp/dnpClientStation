@@ -27,7 +27,7 @@
     </@t.TimeRangeForm>
 
     <div>
-        <table class="table mt-3">
+        <table id="transactTable" style="font-size: 0.83rem" class="table mt-3">
             <thead class="thead-light text-center">
             <tr>
                 <th scope="col">Создано</th>

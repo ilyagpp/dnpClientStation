@@ -68,7 +68,7 @@
         </#if>
         <input type="hidden" name="_csrf" value="${_csrf.token}">
         <span class="form-inline">
-        <#if !isRegisterForm ><a class="btn btn-danger mr-2" href="/registration" role="link">Регистрация</a></#if>
+        <#if !isRegisterForm ><a class="btn btn-danger disabled mr-2" href="/registration" role="link">Регистрация</a></#if>
         <button class="btn btn-primary" type="submit"><#if isRegisterForm>Создать<#else>Войти</#if></button>
         </span>
     </form>

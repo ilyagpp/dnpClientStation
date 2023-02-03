@@ -7,15 +7,6 @@
             <h5>Список АЗС:</h5>
         </div>
         <div>
-            Поиск
-            <form method="get" class="form-inline">
-                <input class="form-control mr-sm-2" type="search" name="search" aria-label="Search"
-                       <#if search??>value="${search}" <#else> placeholder="имя, фамилия, номер" </#if>>
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Найти</button>
-                <a class="btn btn-outline-primary ml-2 my-sm-0" href="${referer!""}" role="link">Сброс</a>
-            </form>
-        </div>
-        <div>
             <table class="table mt-3">
                 <thead class="thead-light">
                 <tr>

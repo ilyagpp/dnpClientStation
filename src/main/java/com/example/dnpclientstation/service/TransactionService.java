@@ -7,15 +7,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
-import java.lang.Long;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,12 +50,11 @@ public class TransactionService {
     }
 
 
-
     public List<FuelTransaction> findByCreatorId(Long id) {
         return transactionsRepo.findByCreatorId(id);
     }
 
-    public List<FuelTransaction> findByCreatorIdLimited(Long id, int limit){
+    public List<FuelTransaction> findByCreatorIdLimited(Long id, int limit) {
         Page<FuelTransaction> page = transactionsRepo.findByCreatorId(id,
                 PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "id")));
         List<FuelTransaction> result = page.getContent();
@@ -75,8 +78,8 @@ public class TransactionService {
             endTime = LocalDateTime.parse(end);
         }
 
-        boolean payTypeNotAll = ((payType!= null) && (payType != 100));
-        boolean operationNotAll = ((operationType != null) && (operationType !=100));
+        boolean payTypeNotAll = ((payType != null) && (payType != 100));
+        boolean operationNotAll = ((operationType != null) && (operationType != 100));
 
         boolean isNalType = getType(payType);
 
@@ -86,25 +89,34 @@ public class TransactionService {
         List<FuelTransaction> transactionList = new ArrayList<>();
         if (showAll) {
             transactionList = transactionsRepo.findByCreateDateTimeBetween(startTime, endTime);
-        } else{
+        } else {
             transactionList = transactionsRepo.findByCreatorIdAndCreateDateTimeBetween(id, startTime, endTime);
         }
 
-        List<FuelTransaction> resulTlist =  transactionList.stream()
-                .filter( fuelTransaction -> {
-            if (payTypeNotAll) {
-               return fuelTransaction.isNal().booleanValue() == isNalType;
-            }
-            if (operationNotAll){
-                return fuelTransaction.isAccumulate().booleanValue() == isAccumType;
-            }
-            return true;
-        })
-                .collect(Collectors.toList());
 
-        resulTlist.sort(comparator.reversed());
+        if (payTypeNotAll) {
 
-        Page<FuelTransaction> page = (Page<FuelTransaction>) ControllerUtils.listToPage(pageable, resulTlist);
+            List<FuelTransaction> payTypeSortList = transactionList.stream()
+                    .filter(fuelTransaction -> {
+                        return fuelTransaction.isNal() == isNalType;
+                    })
+                    .collect(Collectors.toList());
+            transactionList = payTypeSortList;
+        }
+        if (operationNotAll) {
+
+            List<FuelTransaction> opeationNotAllList = transactionList.stream()
+                    .filter(fuelTransaction -> {
+                        return fuelTransaction.isAccumulate() == isAccumType;
+                    })
+                    .collect(Collectors.toList());
+            transactionList = opeationNotAllList;
+        }
+
+
+        transactionList.sort(comparator.reversed());
+
+        Page<FuelTransaction> page = (Page<FuelTransaction>) ControllerUtils.listToPage(pageable, transactionList);
         return page;
 
     }
@@ -117,21 +129,10 @@ public class TransactionService {
             }
             return o1.getId() > o2.getId() ? 1 : -1;
         }
-
     };
 
-
-
-    public int getStartIndex (Pageable pageable){
-
-        if (pageable.getPageNumber() == 0) return 0;
-        return pageable.getPageNumber()* pageable.getPageSize();
-
-
-    }
-
     private Boolean getType(Integer action) {
-        if (action == null) return  false;
+        if (action == null) return false;
         return action == 0;
     }
 
@@ -141,10 +142,10 @@ public class TransactionService {
 
         String operation = "'накопление бонусов'";
 
-        if(nal) {
-            log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, объем = %f, цена = %f, наличный, %s",operation, id, cardNumber, fuel, volume, price, creator.toString()));
-        } else  log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, объем = %f, цена = %f, безналичный, %s",operation, id, cardNumber, fuel, volume, price, creator.toString()));
-
+        if (nal) {
+            log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, объем = %f, цена = %f, наличный, %s", operation, id, cardNumber, fuel, volume, price, creator.toString()));
+        } else
+            log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, объем = %f, цена = %f, безналичный, %s", operation, id, cardNumber, fuel, volume, price, creator.toString()));
 
 
         ClientCard clientCard = cardService.findByCardNumber(cardNumber);
@@ -152,17 +153,17 @@ public class TransactionService {
 
         if (clientCard == null || volume < 0.0f || creator == null) {
 
-            String errorReason ="";
-            if (clientCard == null){
+            String errorReason = "";
+            if (clientCard == null) {
                 errorReason = "clientCard = null";
             }
-            if (volume < 0){
+            if (volume < 0) {
                 errorReason = "volume < 0";
             }
-            if (creator == null){
+            if (creator == null) {
                 errorReason = "creator = null";
             }
-            log.warn("транзакция не обработана: " + errorReason );
+            log.warn("транзакция не обработана: " + errorReason);
             return null;
         }
 
@@ -172,7 +173,7 @@ public class TransactionService {
 
             transaction = transactionsRepo.getOne(id);
 
-            log.info("Транзакция найдена: "+ transaction.toString() );
+            log.info("Транзакция найдена: " + transaction.toString());
 
             clientCard.setBonus(clientCard.getBonus() - transaction.getBonus());
 
@@ -183,8 +184,8 @@ public class TransactionService {
 
                 try {
                     transaction.setFuel(FuelUtil.convert(fuel));
-                }catch (NumberFormatException e){
-                    log.error("Неизвестный или неверный вид топлива: " +fuel);
+                } catch (NumberFormatException e) {
+                    log.error("Неизвестный или неверный вид топлива: " + fuel);
                     return null;
                 }
 
@@ -211,8 +212,8 @@ public class TransactionService {
 
             try {
                 transaction.setFuel(FuelUtil.convert(fuel));
-            }catch (NumberFormatException e){
-                log.error("Неизвестный или неверный вид топлива: " +fuel);
+            } catch (NumberFormatException e) {
+                log.error("Неизвестный или неверный вид топлива: " + fuel);
                 return null;
             }
 
@@ -230,7 +231,7 @@ public class TransactionService {
         clientCard.setBonus(clientCard.getBonus() + transaction.getBonus());
         cardService.save(clientCard);
         FuelTransaction resultTransaction = transactionsRepo.save(transaction);
-        log.info("Транзакция "+ operation +" успешно обработана :"+ resultTransaction.toString());
+        log.info("Транзакция " + operation + " успешно обработана :" + resultTransaction.toString());
         return resultTransaction;
     }
 
@@ -238,8 +239,8 @@ public class TransactionService {
         return (float) ServiceUtil.round(volume * price, 2);
     }
 
-    public Float getVolume(Float total, Float price){
-        return (float)  ServiceUtil.round(total/price, 2);
+    public Float getVolume(Float total, Float price) {
+        return (float) ServiceUtil.round(total / price, 2);
     }
 
     public Float getBonusPercent() {
@@ -247,15 +248,15 @@ public class TransactionService {
     }
 
 
-    public Optional<Client> findClientById(Long id){
-       return clientService.findById(id);
+    public Optional<Client> findClientById(Long id) {
+        return clientService.findById(id);
     }
 
     public ClientCard getClientCardByCardNumber(String cardNumber) {
         return cardService.findByCardNumber(cardNumber);
     }
 
-    public List<Price> getPriceListByCreatorId(Long creatorId){
+    public List<Price> getPriceListByCreatorId(Long creatorId) {
         return priceService.findAllByCreatorId(creatorId);
     }
 
@@ -265,23 +266,24 @@ public class TransactionService {
         String operation = "Списание бонусов";
         ClientCard card = cardService.findByCardNumber(cardNumber);
 
-        if(nal) {
-            log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, бонусов = %f, цена = %f, наличный, %s",operation, id, cardNumber, fuel, bonus, price, creator.toString()));
-        } else  log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, бонусов = %f, цена = %f, безналичный, %s",operation, id, cardNumber, fuel, bonus, price, creator.toString()));
+        if (nal) {
+            log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, бонусов = %f, цена = %f, наличный, %s", operation, id, cardNumber, fuel, bonus, price, creator.toString()));
+        } else
+            log.info(String.format("Запрос на обработку транзакции %s: id = %d, номер карты = %s, %s, бонусов = %f, цена = %f, безналичный, %s", operation, id, cardNumber, fuel, bonus, price, creator.toString()));
 
         if (id != null) {
             FuelTransaction updateUseBonusTransaction = transactionsRepo.getOne(id);
-            Float rollBackBonus = card.getBonus() +(updateUseBonusTransaction.getBonus()* -1);
+            Float rollBackBonus = card.getBonus() + (updateUseBonusTransaction.getBonus() * -1);
 
-            if (rollBackBonus >= bonus){
+            if (rollBackBonus >= bonus) {
                 card.setBonus(rollBackBonus);
                 updateUseBonusTransaction.setBonus(bonus * -1);
 
 
                 try {
                     updateUseBonusTransaction.setFuel(FuelUtil.convert(fuel));
-                } catch (NumberFormatException e){
-                    log.error("Неизвестный или неверный вид топлива: " +fuel);
+                } catch (NumberFormatException e) {
+                    log.error("Неизвестный или неверный вид топлива: " + fuel);
                     return null;
                 }
 
@@ -295,7 +297,7 @@ public class TransactionService {
                 cardService.save(card);
 
                 FuelTransaction resultTransaction = transactionsRepo.save(updateUseBonusTransaction);
-                log.info("Транзакция "+ operation +" успешно обработана :"+ resultTransaction.toString());
+                log.info("Транзакция " + operation + " успешно обработана :" + resultTransaction.toString());
 
                 return resultTransaction;
 
@@ -318,8 +320,8 @@ public class TransactionService {
                 useBonusTransaction.setAccumulate(accumulate);
                 try {
                     useBonusTransaction.setFuel(FuelUtil.convert(fuel));
-                }catch (NumberFormatException e){
-                    log.error("Неизвестный или неверный вид топлива: " +fuel);
+                } catch (NumberFormatException e) {
+                    log.error("Неизвестный или неверный вид топлива: " + fuel);
                     return null;
                 }
 
@@ -329,7 +331,7 @@ public class TransactionService {
 
                 cardService.save(card);
                 FuelTransaction resultTransaction = transactionsRepo.save(useBonusTransaction);
-                log.info("Транзакция "+ operation +" успешно обработана :"+ resultTransaction.toString());
+                log.info("Транзакция " + operation + " успешно обработана :" + resultTransaction.toString());
                 return resultTransaction;
             }
             return null;
@@ -339,21 +341,21 @@ public class TransactionService {
     @Transactional(readOnly = false)
     public int deleteById(Long id) {
 
-         boolean result = restoreBeforeDelete(id);
-         if (result){
-             transactionsRepo.deleteById(id);
-             return 0;
-         } else return -1;
+        boolean result = restoreBeforeDelete(id);
+        if (result) {
+            transactionsRepo.deleteById(id);
+            return 0;
+        } else return -1;
 
     }
 
     @Transactional(readOnly = false)
-    public boolean restoreBeforeDelete(Long id){
+    public boolean restoreBeforeDelete(Long id) {
 
 
         FuelTransaction transaction = transactionsRepo.getOne(id);
 
-        if (transaction.getId() == null){
+        if (transaction.getId() == null) {
             return false;
         }
 
@@ -372,7 +374,7 @@ public class TransactionService {
 
         clientCard.setBonus(bonus);
         cardService.save(clientCard);
-        log.info("Удаляется транзакция: "+ transaction);
+        log.info("Удаляется транзакция: " + transaction);
         return true;
     }
 
@@ -380,14 +382,14 @@ public class TransactionService {
 
         Client client = clientService.findByClientCard(cardService.findByCardNumber(clientCard));
 
-        if(client == null){
+        if (client == null) {
             return false;
         }
         return client.getPin().equals(pin);
     }
 
 
-    public static Float convertIntToFloat(Integer integer, Integer decimal){
+    public static Float convertIntToFloat(Integer integer, Integer decimal) {
 
         float newDecimal = (float) Math.pow(10, decimal);
 
