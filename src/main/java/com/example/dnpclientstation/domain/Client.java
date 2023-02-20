@@ -73,6 +73,7 @@ public class Client implements Persistable<java.lang.Long> {
     private String pin;
 
 
+
     public User getUser() {
         return user;
     }
@@ -100,20 +101,6 @@ public class Client implements Persistable<java.lang.Long> {
     public Client() {
     }
 
-    public Client(java.lang.Long id, String name, String surname, String patronymic, Sex sex, LocalDate birthday, LocalDateTime added, boolean active, String email, String phoneNumber, ClientCard clientCard, User user) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.patronymic = patronymic;
-        this.sex = sex;
-        this.birthday = birthday;
-        this.added = added;
-        this.active = active;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.clientCard = clientCard;
-        this.user = user;
-    }
 
     public String getName() {
         return name;

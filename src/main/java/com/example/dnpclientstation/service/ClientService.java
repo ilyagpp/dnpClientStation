@@ -189,7 +189,8 @@ public class ClientService {
     }
 
     public boolean addNewOrEditClient(Client client, Model model) {
-        if (client.getId() == null) {
+        if (client.isNew()) {
+
 
             if (findByEmail(client.getEmail()) != null) {
                 model.addAttribute("emailError", "Пользователь с таким адресом уже существует!");

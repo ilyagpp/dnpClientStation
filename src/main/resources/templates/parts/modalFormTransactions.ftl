@@ -21,13 +21,13 @@
                     <div id="nal" class="form-group">
                         <label for="nal">Тип оплаты</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="nal" id="nal" value="true" checked>
+                            <input class="form-check-input" type="radio" name="nal" id="nal" value="true">
                             <label class="form-check-label" for="nal">
                                 Наличными
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="nal" id="nal" value="false">
+                            <input class="form-check-input" type="radio" name="nal" id="nal" value="false" checked>
                             <label class="form-check-label" for="nal">
                                 Безналичными
                             </label>
@@ -114,13 +114,13 @@
                         <div id="nal" class="form-group">
                             <label for="nal">Тип оплаты</label>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="nal" id="nal" value="true" checked>
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="true">
                                 <label class="form-check-label" for="nal">
                                     Наличными
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="nal" id="nal" value="false">
+                                <input class="form-check-input" type="radio" name="nal" id="nal" value="false" checked>
                                 <label class="form-check-label" for="nal">
                                     Безналичными
                                 </label>

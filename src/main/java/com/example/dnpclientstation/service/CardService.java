@@ -51,8 +51,11 @@ public class CardService {
     }
 
     public String getLastCardNumber() {
-        String result = cardRepo.findAllByOrderByIdDesc().get(0).getCardNumber();
-        return result != null? result : STARTCARDNUMBER;
+        try {
+            return cardRepo.findAllByOrderByIdDesc().get(0).getCardNumber();
+        }catch (Exception e){
+            return STARTCARDNUMBER;
+        }
     }
 
     public List<ClientCard> getAll() {

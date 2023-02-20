@@ -201,7 +201,7 @@ public class TransactionService {
 
             transaction.setUpdateDateTime(LocalDateTime.now());
 
-            transaction.setBonus(getTotal(transaction.getVolume(), transaction.getPrice()) * getBonusPercent());
+            transaction.setBonus(getTotal(transaction.getVolume(), transaction.getPrice()) * getBonusPercent(creator));
 
             transaction.setCreator(creator);
 
@@ -223,7 +223,7 @@ public class TransactionService {
             transaction.setPrice(price);
             transaction.setVolume(volume);
             transaction.setTotal(getTotal(volume, price));
-            transaction.setBonus(getTotal(volume, price) * getBonusPercent());
+            transaction.setBonus(getTotal(volume, price) * getBonusPercent(creator));
             transaction.setCreator(creator);
             transaction.setNal(nal);
             transaction.setAccumulate(accumulate);
@@ -243,8 +243,12 @@ public class TransactionService {
         return (float) ServiceUtil.round(total / price, 2);
     }
 
-    public Float getBonusPercent() {
-        return bonusPercent / 100;
+    public Float getBonusPercent(User creator) {
+        try {
+            return creator.getAzs().getBonus() / 100;
+        }catch (NullPointerException e){
+            return 0f;
+        }
     }
 
 
@@ -353,23 +357,19 @@ public class TransactionService {
     public boolean restoreBeforeDelete(Long id) {
 
 
-        FuelTransaction transaction = transactionsRepo.getOne(id);
+        FuelTransaction transaction = transactionsRepo.findById(id).orElse(null);
 
-        if (transaction.getId() == null) {
+        if (transaction == null) {
             return false;
         }
 
         ClientCard clientCard = cardService.findByCardNumber(transaction.getCardNumber());
 
         float bonus = 0.0f;
-
-        if (transaction.getBonus() >= 0) {
-
-            bonus = transaction.getBonus() + clientCard.getBonus();
-
+        if (transaction.isAccumulate()){
+            bonus = clientCard.getBonus() - transaction.getBonus();
         } else {
-
-            bonus = transaction.getBonus() * -1 + clientCard.getBonus();
+            bonus = clientCard.getBonus() + (transaction.getBonus()* -1);
         }
 
         clientCard.setBonus(bonus);

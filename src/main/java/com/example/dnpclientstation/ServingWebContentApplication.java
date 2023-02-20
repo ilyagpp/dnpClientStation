@@ -16,5 +16,4 @@ public class ServingWebContentApplication extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder){
         return builder.sources(ServingWebContentApplication.class);
     }
-
 }
