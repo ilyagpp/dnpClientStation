@@ -54,8 +54,14 @@ public class MobileController {
                                    Model model){
         if (client.getId() == null) {
 
-            if (client.getEmail() != null && !clientService.checkEmail(client.getEmail())) {
-                model.addAttribute("emailError", String.format("Email %s уже зарегистрирован, попробуйте другой", client.getEmail()));
+            if (client.getEmail() != null)  {
+
+
+                ControllerUtils.isValidPhoneNumber(client.getPhoneNumber(), model);
+
+                if (!clientService.checkEmail(client.getEmail())) {
+                    model.addAttribute("emailError", String.format("Email %s уже зарегистрирован, попробуйте другой", client.getEmail()));
+                }
             }
 
             if (client.getPhoneNumber() != null && !clientService.checkPhoneNumber(client.getPhoneNumber())) {
@@ -93,6 +99,11 @@ public class MobileController {
 
 
         if (phoneNumber != null && !phoneNumber.equals("")) {
+
+            if (!ControllerUtils.isValidPhoneNumber(phoneNumber, model)){
+                return "/mobileRemindPin";
+            }
+
 
             Client client = clientService.findByPhoneNumber(phoneNumber);
             if (client != null){

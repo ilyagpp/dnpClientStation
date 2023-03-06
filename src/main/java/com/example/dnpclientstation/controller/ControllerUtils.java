@@ -50,6 +50,19 @@ public class ControllerUtils {
         List<?> subList = entities.subList(lowerBound, upperBound);
 
         return new PageImpl<>(subList, pageable, entities.size());
-    };
+    }
+
+    public static boolean isValidPhoneNumber(String phoneNumber, Model model) {
+
+        if (phoneNumber.length()!= 10){
+            model.addAttribute("phoneNumberError", String.format("не верный формат номера %s, введите номер в формате 999 123 45 67", phoneNumber));
+            return false;
+        }
+        if (phoneNumber.startsWith("+")|| phoneNumber.startsWith("7")|| phoneNumber.startsWith("8")){
+            model.addAttribute("phoneNumberError", String.format("Номер %s не должен начинаться с +7 или с 8, введите номер в формате 999 123 4567", phoneNumber));
+            return false;
+        }
+        return true;
+    }
 
 }
