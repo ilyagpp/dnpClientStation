@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
@@ -46,8 +47,16 @@ public class ControllerUtils {
     public static Page<?> listToPage(Pageable pageable, List<?> entities) {
         int lowerBound = pageable.getPageNumber() * pageable.getPageSize();
         int upperBound = Math.min(lowerBound + pageable.getPageSize(), entities.size());
-
-        List<?> subList = entities.subList(lowerBound, upperBound);
+        List<?> subList = new ArrayList<>();
+        try {
+            subList = entities.subList(lowerBound, upperBound);
+        } catch (Exception e) {
+            if (pageable.getPageSize() <= entities.size()) {
+                subList = entities.subList(0, pageable.getPageSize());
+            } else {
+                subList = entities;
+            }
+        }
 
         return new PageImpl<>(subList, pageable, entities.size());
     }
