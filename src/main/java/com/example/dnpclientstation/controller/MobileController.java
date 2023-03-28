@@ -53,24 +53,31 @@ public class MobileController {
                                    @RequestHeader(required = false) String referer,
                                    Model model){
         if (client.getId() == null) {
-
+            boolean isValidClientData = true;
             if (client.getEmail() != null)  {
-
-
-                ControllerUtils.isValidPhoneNumber(client.getPhoneNumber(), model);
-
                 if (!clientService.checkEmail(client.getEmail())) {
                     model.addAttribute("emailError", String.format("Email %s уже зарегистрирован, попробуйте другой", client.getEmail()));
+                    isValidClientData = false;
                 }
+
             }
 
-            if (client.getPhoneNumber() != null && !clientService.checkPhoneNumber(client.getPhoneNumber())) {
-                model.addAttribute("phoneNumberError", String.format("Номер %s уже зарегистрирован, попробуйте другой", client.getPhoneNumber()));
+            if (client.getPhoneNumber() != null) {
+
+                if (!ControllerUtils.isValidPhoneNumber(client.getPhoneNumber(), model)){
+                    isValidClientData = false;
+                }
+
+                if (!clientService.checkPhoneNumber(client.getPhoneNumber())) {
+                    model.addAttribute("phoneNumberError", String.format("Номер %s уже зарегистрирован, попробуйте другой", client.getPhoneNumber()));
+                    isValidClientData = false;
+                }
             }
 
 
             if  (!StringUtils.isEmpty(client.getPin()) && client.getPin().length() != 4){
                 model.addAttribute("pinError","Не валидный пин");
+                isValidClientData = false;
             }
 
             if (result.hasErrors()) {
@@ -81,6 +88,7 @@ public class MobileController {
 
                 return "/mobileclientregistr";
             }
+            if (!isValidClientData){ return "/mobileclientregistr"; }
         }
         if (clientService.addNewOrEditClient(client, model)) {
             model.addAttribute("register", "Успешная регистрация!");

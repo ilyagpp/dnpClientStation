@@ -37,11 +37,11 @@ public class TerminalController {
 
 
     @GetMapping("/{term_id}")
-    public ResponseEntity<Integer> onLine(@PathVariable Long term_id){
+    public ResponseEntity<Integer> onLine(@PathVariable Long term_id) {
 
-         Optional<User> user = userService.findById(term_id);
+        Optional<User> user = userService.findById(term_id);
 
-        return user.isPresent()? new ResponseEntity<>(0, HttpStatus.OK):
+        return user.isPresent() ? new ResponseEntity<>(0, HttpStatus.OK) :
                 new ResponseEntity<>(-1, HttpStatus.NOT_FOUND);
     }
 
@@ -49,34 +49,32 @@ public class TerminalController {
     public ResponseEntity<Client> getClient(@RequestParam(required = false) String input) {
 
         Client client = clientService.searchClientByCardNameEmailPhone(input);
-
-
         return client != null ? new ResponseEntity<>(client, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/{term_id}/accumulate")
     public ResponseEntity<TerminalTransaction> accumulate(@PathVariable Long term_id,
-                                                      @RequestParam(required = false) Long id,
-                                                      @RequestParam Boolean nal,
-                                                      @RequestParam @NotBlank String cardNumber,
-                                                      @RequestParam @NotBlank String fuel,
-                                                      @RequestParam @NotNull Integer price,
-                                                      Principal principal,
-                                                      @RequestParam @NotNull Integer volume) {
+                                                          @RequestParam(required = false) Long id,
+                                                          @RequestParam Boolean nal,
+                                                          @RequestParam @NotBlank String cardNumber,
+                                                          @RequestParam @NotBlank String fuel,
+                                                          @RequestParam @NotNull Integer price,
+                                                          Principal principal,
+                                                          @RequestParam @NotNull Integer volume) {
 
         Optional<User> creator = userService.findById(term_id);
         if (creator.isPresent() && creator.get().getUsername().equals(principal.getName())) {
             FuelTransaction fuelTransaction =
-                    transactionService.createOrUpdateTransaction(id, cardNumber, fuel, TransactionService.convertIntToFloat(volume,3),
+                    transactionService.createOrUpdateTransaction(id, cardNumber, fuel, TransactionService.convertIntToFloat(volume, 3),
                             TransactionService.convertIntToFloat(price, 2), nal, creator.get(), true);
 
-            if (id != null){
-                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false , true), HttpStatus.ACCEPTED)
+            if (id != null) {
+                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false, true), HttpStatus.ACCEPTED)
                         : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             } else
-            return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false, true), HttpStatus.CREATED)
-                    : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                return fuelTransaction != null ? new ResponseEntity<>(new TerminalTransaction(fuelTransaction, false, true), HttpStatus.CREATED)
+                        : new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
@@ -100,17 +98,17 @@ public class TerminalController {
 
             boolean checkPin = transactionService.checkPin(cardNumber, pin);
             if (!checkPin) {
-                TerminalTransaction transaction = new TerminalTransaction(new FuelTransaction(), false , false);
+                TerminalTransaction transaction = new TerminalTransaction(new FuelTransaction(), false, false);
                 return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), false, false), HttpStatus.BAD_REQUEST);
             }
 
-            FuelTransaction transaction = transactionService.useBonus(id, fuel, cardNumber, bonus, TransactionService.convertIntToFloat(price,2), nal, creator.get(), false);
+            FuelTransaction transaction = transactionService.useBonus(id, fuel, cardNumber, bonus, TransactionService.convertIntToFloat(price, 2), nal, creator.get(), false);
 
             if (transaction != null) {
-                if (id != null){
-                    return new ResponseEntity<>(new TerminalTransaction(transaction, true ,false), HttpStatus.ACCEPTED);
-                }else
-                return new ResponseEntity<>(new TerminalTransaction(transaction, true, false), HttpStatus.CREATED);
+                if (id != null) {
+                    return new ResponseEntity<>(new TerminalTransaction(transaction, true, false), HttpStatus.ACCEPTED);
+                } else
+                    return new ResponseEntity<>(new TerminalTransaction(transaction, true, false), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(new TerminalTransaction(new FuelTransaction(), true, false), HttpStatus.BAD_REQUEST);
             }

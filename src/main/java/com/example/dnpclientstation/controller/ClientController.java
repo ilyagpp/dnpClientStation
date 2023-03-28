@@ -34,31 +34,27 @@ public class ClientController {
     MailService mailService;
 
 
-
-
     @GetMapping("/clients")
     public String getAllClients(Model model,
-                                @RequestParam (required = false) String search,
-                                @RequestParam (required = false) Integer size,
-                                @RequestHeader(required = false) String referer,
+                                @RequestParam(required = false) String search,
+                                @RequestParam(required = false) Integer size,
                                 @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable) {
 
         model.addAttribute("size", size);
 
-        if (search != null){
+        if (search != null && !search.isEmpty()) {
 
             List<Client> searchClients = clientService.searchAll(search);
-            Page<Client> clients = new PageImpl<Client>(searchClients, pageable, searchClients.size());
+            Page<Client> clients = new PageImpl<>(searchClients, pageable, searchClients.size());
             model.addAttribute("page", clients);
             model.addAttribute("search", search);
-            model.addAttribute("referer",referer.split("\\?")[0]);
-        }else {
+        } else {
 
             Page<Client> list = clientService.findAll(pageable);
             model.addAttribute("page", list);
         }
-            ControllerUtils.initPageSize(model, size, pageable);
-            model.addAttribute("url", "/clients");
+        ControllerUtils.initPageSize(model, size, pageable);
+        model.addAttribute("url", "/clients");
 
 
         return "/clients";
@@ -84,17 +80,14 @@ public class ClientController {
                 model.addAttribute("phoneNumberError", String.format("Номер %s уже зарегистрирован, попробуйте другой", client.getPhoneNumber()));
             }
 
-
-            if  (!StringUtils.isEmpty(client.getPin()) && client.getPin().length() != 4){
-                model.addAttribute("pinError","Не валидный пин");
+            if (!StringUtils.isEmpty(client.getPin()) && client.getPin().length() != 4) {
+                model.addAttribute("pinError", "Не валидный пин");
             }
 
             if (result.hasErrors()) {
                 Map<String, String> errors = ControllerUtils.getErrors(result);
                 model.mergeAttributes(errors);
-
                 model.addAttribute("client", client);
-
                 return "/client";
             }
         }
@@ -103,10 +96,7 @@ public class ClientController {
         } else model.addAttribute("clientError", "Ошибка! Клиент не создан!");
 
         return "/client";
-
     }
-
-
 
     @PostMapping("client/edit/{id}")
     public String updateClient(@Valid Client client,
@@ -205,16 +195,16 @@ public class ClientController {
     public String getPin(@RequestParam(required = false) String search,
                          @RequestParam(required = false) Boolean showPin,
                          @RequestParam(defaultValue = "false") Boolean recallPin,
-                         Model model){
+                         Model model) {
 
 
         if (search != null) {
             model.addAttribute("search", search);
             Client client = clientService.searchClientByCardNameEmailPhone(search);
-            if (client != null && recallPin){
+            if (client != null && recallPin) {
 
                 mailService.recallPin(client);
-                model.addAttribute("mailSend", String.format("Пин-код успешно отправлен на email: %s",client.getEmail()));
+                model.addAttribute("mailSend", String.format("Пин-код успешно отправлен на email: %s", client.getEmail()));
                 return "clientOk";
 
             }
@@ -226,22 +216,23 @@ public class ClientController {
                     model.addAttribute("showPin", "true");
                 }
             } else {
-                model.addAttribute("clientError", String.format("по запросу %s ничего не найдено",search));
+                model.addAttribute("clientError", String.format("по запросу %s ничего не найдено", search));
             }
 
         }
         return "pin";
     }
+
     @PostMapping("client/pin/{id}")
-    public String changePin (@PathVariable Long id,
-                             String pin,
-                             @RequestHeader(required = false) String referer,
-                             Model model){
+    public String changePin(@PathVariable Long id,
+                            String pin,
+                            @RequestHeader(required = false) String referer,
+                            Model model) {
 
-        if (pin != null && pin.length()==4){
-           boolean result =  clientService.changePin(pin , id);
+        if (pin != null && pin.length() == 4) {
+            boolean result = clientService.changePin(pin, id);
 
-            if (result){
+            if (result) {
                 model.addAttribute("clientOk", "Новый пин успешно установлен");
                 return "clientOk";
             }
@@ -249,11 +240,6 @@ public class ClientController {
         model.addAttribute("error", "При смене пин кода произошла ошибка!");
         model.addAttribute("referer", referer);
         return "er";
-
-
     }
-
-
-
 
 }
