@@ -28,7 +28,7 @@
     <div class="col">
         <div class="input-group">
           <div class="input-group-prepend">
-            <label class="input-group-text" for="payType">Тип Оплаты</label>
+            <label class="input-group-text" for="payType">Оплата</label>
           </div>
           <select class="custom-select" id="payType" name="payType">
             <option <#if payType?? && payType ==100> selected</#if> value="100">Все</option>
@@ -50,15 +50,15 @@
         </div>
     </div>
         <input type="hidden" name="size" value="${size}">
-    <button class="btn btn-primary" type="submit">Показать</button>
+    <button class="btn btn-outline-success" type="submit">Показать</button>
 
-        <a class="btn btn-primary ml-3" href="/transactions" role="link">Сброс</a>
+        <a class="btn btn-outline-primary ml-2" href="/transactions" role="link">Сброс</a>
     </span>
     </form>
-<style>
-    #timerangeform{
-        font-size: 0.8rem;
-    }
-</style>
+    <style>
+        #timerangeform{
+            font-size: 0.8rem;
+        }
+    </style>
 </#macro>
 
