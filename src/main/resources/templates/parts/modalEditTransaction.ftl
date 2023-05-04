@@ -66,7 +66,7 @@
                             <h5 style="color: red">"Заполнять очень внимательно!"</h5>
                         </div>
                         <div class="form-group">
-                            <input type="hidden" name="id" value="${editTransaction.getId()}">
+                            <input type="hidden" name="id" value="${editTransaction.getId()?c}">
                             <input type="hidden" name="_csrf" value="${_csrf.token}">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                             <button type="submit" class="btn btn-primary">Применить</button>
@@ -144,7 +144,7 @@
                             <h5 style="color: red">"Заполнять очень внимательно!"</h5>
                         </div>
                         <div class="form-group">
-                            <input type="hidden" name="id" value="${editTransaction.getId()}">
+                            <input type="hidden" name="id" value="${editTransaction.getId()?c}">
                             <input type="hidden" name="_csrf" value="${_csrf.token}">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                             <button type="submit" class="btn btn-primary">Применить</button>

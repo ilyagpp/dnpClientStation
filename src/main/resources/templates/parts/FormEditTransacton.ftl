@@ -11,7 +11,7 @@
         <#if editTransaction??>
             <form class="form-inline">
                 <div class="card-body">
-                    <h5 class="card-title">Транзакция:${editTransaction.id}</h5>
+                    <h5 class="card-title">Транзакция:${editTransaction.id?c}</h5>
                     <div class="form-group row">
                         <label for="clientCard" class="col-sm-2 col-form-label">Карта клиента</label>
                         <div class="col-sm-10">

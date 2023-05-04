@@ -12,7 +12,7 @@
 
     <form id="reg">
     <div class="form-group">
-        <#if edit??><input type="hidden" name="id" value="${client.getId()}"></#if>
+        <#if edit??><input type="hidden" name="id" value="${client.getId()?c}"></#if>
         <label for="surname">Фамилия</label>
         <input type="text" name="surname" maxlength="50"
                class="form-control ${(surnameError??)?string('is-invalid', '')} text-center" id="surname"

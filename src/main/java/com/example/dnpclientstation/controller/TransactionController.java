@@ -201,7 +201,7 @@ public class TransactionController {
                                   RedirectAttributes redirectAttributes,
                                   @RequestHeader(required = false) String referer) {
 
-        FuelTransaction fuelTransaction = transactionService.findFuelTransactionById(Long.valueOf(id)).orElse(null);
+        FuelTransaction fuelTransaction = transactionService.findFuelTransactionById(Long.parseLong(id)).orElse(null);
         model.addAttribute("editTransaction", fuelTransaction);
         assert fuelTransaction != null;
         ClientCard card = transactionService.getClientCardByCardNumber(fuelTransaction.getCardNumber());

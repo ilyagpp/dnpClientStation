@@ -65,7 +65,7 @@
                         <th scope="col"><#if transaction.creator.getAzsName()??>${transaction.creator.getAzsName()!""}<#else>${transaction.creator.username!""}</#if> </th>
                         <#if transaction.creator.id == id || isAdmin>
                             <th scope="col">
-                                <a type="button" class="btn btn-outline-success btn-sm" href="transactions/edit/${transaction.id}">
+                                <a type="button" class="btn btn-outline-success btn-sm" href="transactions/edit/${transaction.getId()?c}">
                                     <i class="fa-solid fa-pen-to-square fa-lg"></i>
                                 </a>
                             </th>
@@ -73,8 +73,8 @@
                         <#if isAdmin><th scope="col">
                                 <#assign id = transaction.getId()>
 
-                                <form action="transactions/delete/${id}" method="post">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm" href="transactions/delete/${transaction.id}">
+                                <form action="transactions/delete/${id?c}" method="post">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" href="transactions/delete/${transaction.id?c}">
                                         <i class="fa-solid fa-trash-can fa-lg"></i>
                                     </button>
                                     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
