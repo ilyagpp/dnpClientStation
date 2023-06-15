@@ -115,7 +115,6 @@ public class TransactionController {
                                   @RequestParam(required = false) String input
 
     ) {
-
         if (input != null && !input.equals("")) {
 
             input = ControllerUtils.checkByСomma(input);

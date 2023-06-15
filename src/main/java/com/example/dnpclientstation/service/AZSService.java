@@ -6,9 +6,8 @@ import com.example.dnpclientstation.repositories.AZSRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AZSService {
@@ -65,5 +64,18 @@ public class AZSService {
 
         createOrUpdate(azs.getAzs_id(), azs.getAzsName(), azs.getProperties(), azs.isElevatedBonus(), azs.getBonus(), azsIds);
 
+    }
+
+
+    public List<Long> getUsersByAzsIDs(Long[] azsIds) {
+
+        List<User> users = new ArrayList<>();
+        for (Long id: azsIds){
+            AZS azs = findById(id);
+            if (azs != null){
+                users.addAll(azs.getUsers());
+            }
+        }
+        return users.stream().map(User::getId).collect(Collectors.toList());
     }
 }

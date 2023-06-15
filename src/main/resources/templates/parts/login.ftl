@@ -27,13 +27,11 @@
             </div>
         </div>
 
-
-
         <#if !isRegisterForm>
             <div class="form-group row">
                 <div class="col-sm-2">Запомнить меня:</div>
-                <div class="col-sm-10">
-                    <div class="form-check">
+                <div class="col-sm-2">
+                    <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
                     </div>
                 </div>

@@ -99,11 +99,6 @@
             </div>
         </#if>
     </div>
-    <script type="text/javascript">
-        const changeHandler = e => {
-            const value = e.value
-            e.value = value.replace(/[^0-9]/g, '')
-        }
-    </script>
+    <script src="static/JS/TransactionTable.js"></script>
 
 </@c.page>

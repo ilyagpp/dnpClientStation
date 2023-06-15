@@ -75,12 +75,7 @@
                         <button type="submit" class="btn btn-primary">Применить</button>
                     </div>
                 </form>
-                <script type="text/javascript">
-                    const changeHandler = e =>{
-                        const value = e.value
-                        e.value = value.replace(/[^0-9,]/g , '')
-                    }
-                </script>
+                <script src="static/JS/TransactionTable.js"></script>
             </div>
 
         </div>
@@ -156,12 +151,7 @@
                             <button type="submit" class="btn btn-primary">Применить</button>
                         </div>
                     </form>
-                    <script type="text/javascript">
-                        const changeHandler = e =>{
-                            const value = e.value
-                            e.value = value.replace(/[^0-9,]/g , '')
-                        }
-                    </script>
+                    <script src="static/JS/TransactionTable.js"></script>
                 </div>
             </div>
         </div>

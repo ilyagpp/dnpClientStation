@@ -10,7 +10,8 @@
         </div>
     </div>
 
-    <form id="reg">
+    <form id="reg" >
+        <div class="container-fluid" id="clntfrm">
     <div class="form-group">
         <#if edit??><input type="hidden" name="id" value="${client.getId()?c}"></#if>
         <label for="surname">Фамилия</label>
@@ -91,7 +92,7 @@
             </div>
         </#if>
     </div>
-    <div class="form-check">
+    <div class="form-check" style="display: none">
         <input class="form-check-input" type="radio" name="active" id="active" value="true" checked>
         <label class="form-check-label" for="active">
             Активировать
@@ -109,18 +110,14 @@
               </div>
           </#if>
       </div>
-          <script type="text/javascript">
-              const changeHandler = e =>{
-                  const value = e.value
-                  e.value = value.replace(/[^0-9]/g , '')
-              }
-          </script>
+        <script src="static/JS/TransactionTable.js"></script>
       </#if>
     <input type="hidden" name="_csrf" value="${_csrf.token}">
     <div class="form-group">
 
     <button id="two" type="submit" class="btn btn-primary"><#if edit??>Применить<#else>Добавить</#if></button>
     </div>
+        </div>
     </form>
     <div class="card text-center my-3">
         <small id="smtxt">
@@ -136,6 +133,13 @@
     <style>
         #smtxt{
             font-size: 0.6rem;
+        }
+        #clntfrm{
+            text-align: center;
+        }
+        input{
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </#macro>

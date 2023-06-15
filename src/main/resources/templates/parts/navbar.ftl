@@ -64,9 +64,16 @@
                     </div>
                 </li>
             </#if>
-           <#-- <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/main">Обратная связь</a>
-            </li>-->
+            <#if isAdmin  || isAzsAdmin>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" aria-current="page"  href="#" id="reports" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Отчеты
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="reports">
+                        <a class="dropdown-item" href="/reports">отчеты</a>
+                    </div>
+                </li>
+            </#if>
         </ul>
 
         <span class="form-inline my-2 my-lg-0">

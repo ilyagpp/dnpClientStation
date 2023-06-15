@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -45,6 +46,12 @@ public class TransactionService {
     @Autowired
     private PriceService priceService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private AZSService azsService;
+
     public Optional<FuelTransaction> findFuelTransactionById(Long id) {
         return transactionsRepo.findById(id);
     }
@@ -52,6 +59,9 @@ public class TransactionService {
 
     public List<FuelTransaction> findByCreatorId(Long id) {
         return transactionsRepo.findByCreatorId(id);
+    }
+    public List<FuelTransaction> findAll(){
+        return transactionsRepo.findAll();
     }
 
     public List<FuelTransaction> findByCreatorIdLimited(Long id, int limit) {
@@ -394,5 +404,51 @@ public class TransactionService {
         float newDecimal = (float) Math.pow(10, decimal);
 
         return (integer / newDecimal);
+    }
+
+    public List<FuelTransaction> findBySettings(Long[] azs, Integer operation, Integer payType, LocalDateTime start, LocalDateTime end) {
+
+        if (start == null){
+            start = startDateTime;
+        }
+        if (end == null){
+            end = LocalDateTime.now();
+        }
+
+        List<FuelTransaction> transactions = transactionsRepo.findByCreateDateTimeBetween(start, end);
+
+        if (azs != null) {
+            List<Long> userIds = azsService.getUsersByAzsIDs(azs);
+            transactions = transactions.stream()
+                    .filter(fuelTransaction -> {
+                        return userIds.contains(fuelTransaction.getCreator().getId());})
+                    .collect(Collectors.toList());
+        }
+
+        if (payType != null && payType != 100){
+            transactions = transactions.stream().filter(fuelTransaction -> {
+                return fuelTransaction.isNal() == getType(payType);
+            }).collect(Collectors.toList());
+        }
+
+        if (operation != null && operation != 100){
+            transactions = transactions.stream().filter(fuelTransaction -> {
+                return fuelTransaction.isAccumulate() == getType(operation);
+            }).collect(Collectors.toList());
+        }
+
+
+        return transactions;
+    }
+
+    public List<FuelTransaction> findByClient(String phoneNumber) {
+
+        Client client = clientService.findByPhoneNumber(phoneNumber);
+
+        List<FuelTransaction> result = new ArrayList<>();
+        if (client != null) {
+            return transactionsRepo.findByCardNumberOrderByIdDesc(client.getClientCard().getCardNumber());
+        }
+        return result;
     }
 }

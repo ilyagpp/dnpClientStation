@@ -41,7 +41,7 @@ public class FuelTransaction implements Persistable<Long> {
 
     private Float bonus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creator_id")
     @JsonIgnoreProperties({"password", "active", "email", "activationCode", "roles", "enabled", "admin", "azsAdmin",
             "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})

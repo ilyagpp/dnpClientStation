@@ -187,5 +187,4 @@ public class UserService implements UserDetailsService {
            user.setAzs(null);
        }
     }
-
 }
